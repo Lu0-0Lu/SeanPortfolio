@@ -26,17 +26,15 @@ app.get('/', (req, res) => {
 });
 
 // API Routes
-const authRoutes = require('./routes/auth');
-const projectRoutes = require('./routes/projects');
-const experienceRoutes = require('./routes/experiences');
-const certRoutes = require('./routes/certifications');
-const postRoutes = require('./routes/posts');
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/projects', require('./routes/projects'));
+app.use('/api/experiences', require('./routes/experiences'));
+app.use('/api/certifications', require('./routes/certifications'));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/experiences', experienceRoutes);
-app.use('/api/certifications', certRoutes);
-app.use('/api/posts', postRoutes);
+// The New Written Content Routes
+app.use('/api/articles', require('./routes/articles'));
+app.use('/api/books', require('./routes/books'));
+app.use('/api/poetry', require('./routes/poetry'));
 
 // Start Server
 const PORT = process.env.PORT || 5000;

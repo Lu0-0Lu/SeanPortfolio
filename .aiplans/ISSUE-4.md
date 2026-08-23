@@ -6,7 +6,6 @@ Successfully built and integrated a secure, full-stack Content Management System
 ## Key Features Implemented:
 1. **Secure Authentication & Middleware:**
    - JWT token generation upon login.
-   - Protected frontend routes (`ProtectedRoute.jsx`) and backend API verification middleware (`authMiddleware.js`).
 2. **Project Management & Dynamic Bento Grids:**
    - Added support for multi-image arrays (up to 5 images) replacing single URLs.
    - Built an auto-formatting grid collage engine on the homepage depending on the image count (1 to 5 images).

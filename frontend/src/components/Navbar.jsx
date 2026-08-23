@@ -9,6 +9,9 @@ const links = [
   { label: 'Experience', href: '#experience' },
   { label: 'Skills', href: '#skills' },
   { label: 'Contact', href: '#contact' },
+  { label: 'Articles', href: '/articles' },
+{ label: 'Library', href: '/books' },
+{ label: 'Poetry', href: '/poetry' },
 ];
 
 export default function Navbar() {
