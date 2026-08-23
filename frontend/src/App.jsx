@@ -14,13 +14,24 @@ import ManagePoetry from './pages/ManagePoetry';
 import Articles from './pages/Articles';
 import Books from './pages/Books';
 import Poetry from './pages/Poetry';
+import About from './pages/About';
+import Projects from './pages/Projects';
+import Contact from './pages/Contact';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Routes */}
+        {/* Public Landing & Content Pages */}
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/articles" element={<Articles />} />
+        <Route path="/books" element={<Books />} />
+        <Route path="/poetry" element={<Poetry />} />
+        
+        {/* Auth Route */}
         <Route path="/login" element={<Login />} />
         
         {/* Protected Admin Routes */}
@@ -35,56 +46,51 @@ export default function App() {
         <Route 
           path="/admin/projects" 
           element={
-          <ProtectedRoute>
-            <ManageProjects />
+            <ProtectedRoute>
+              <ManageProjects />
             </ProtectedRoute>
           } 
         />
-         <Route 
+        <Route 
           path="/admin/experiences" 
-          element={<ProtectedRoute>
-            <ManageExperiences />
+          element={
+            <ProtectedRoute>
+              <ManageExperiences />
             </ProtectedRoute>
           } 
         />
-         <Route 
-         path="/admin/certifications" 
-         element={<ProtectedRoute>
-          <ManageCertifications />
-          </ProtectedRoute>
+        <Route 
+          path="/admin/certifications" 
+          element={
+            <ProtectedRoute>
+              <ManageCertifications />
+            </ProtectedRoute>
           } 
         />
         <Route 
-         path="/admin/articles" 
-         element={<ProtectedRoute>
-          <ManageArticles />
-          </ProtectedRoute>
+          path="/admin/articles" 
+          element={
+            <ProtectedRoute>
+              <ManageArticles />
+            </ProtectedRoute>
           } 
         />
         <Route 
-         path="/admin/books" 
-         element={<ProtectedRoute>
-          <ManageBooks />
-          </ProtectedRoute>
+          path="/admin/books" 
+          element={
+            <ProtectedRoute>
+              <ManageBooks />
+            </ProtectedRoute>
           } 
         />
         <Route 
-         path="/admin/poetry" 
-         element={<ProtectedRoute>
-          <ManagePoetry />
-          </ProtectedRoute>
+          path="/admin/poetry" 
+          element={
+            <ProtectedRoute>
+              <ManagePoetry />
+            </ProtectedRoute>
           } 
         />
-      </Routes>
-
-      {/* Public Routes for Articles, Books, Poetry */}
-      <Routes>
-        <Route path="/articles" 
-        element={<Articles />} />
-        <Route path="/books" 
-        element={<Books />} />
-        <Route path="/poetry" 
-        element={<Poetry />} />
       </Routes>
     </BrowserRouter>
   );
