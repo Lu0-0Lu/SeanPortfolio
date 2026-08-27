@@ -31,10 +31,16 @@ app.use('/api/projects', require('./routes/projects'));
 app.use('/api/experiences', require('./routes/experiences'));
 app.use('/api/certifications', require('./routes/certifications'));
 
+
 // The New Written Content Routes
 app.use('/api/articles', require('./routes/articles'));
 app.use('/api/books', require('./routes/books'));
 app.use('/api/poetry', require('./routes/poetry'));
+
+// The New Category Routes
+app.use('/api/categories', require('./routes/categories'));
+app.use('/api/book-categories', require('./routes/bookCategories'));
+app.use('/api/book-tags', require('./routes/bookTags'));
 
 // Start Server
 const PORT = process.env.PORT || 5000;

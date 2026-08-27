@@ -11,12 +11,17 @@ import ManageArticles from './pages/ManageArticles';
 import ManageBooks from './pages/ManageBooks';
 import ManagePoetry from './pages/ManagePoetry';
 
+import ManageCategories from './pages/ManageCategories';
+import ManageBookCategories from './pages/ManageBookCategories';
+
 import Articles from './pages/Articles';
 import Books from './pages/Books';
 import Poetry from './pages/Poetry';
 import About from './pages/About';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
+import ArticleDetail from './pages/ArticleDetail';
+
 
 export default function App() {
   return (
@@ -91,6 +96,29 @@ export default function App() {
             </ProtectedRoute>
           } 
         />
+
+        {/* Categories Page */}
+        <Route 
+          path="/admin/categories" 
+          element={
+            <ProtectedRoute>
+              <ManageCategories />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/book-categories" 
+          element={
+            <ProtectedRoute>
+              <ManageBookCategories />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Article Detail Page */}
+        <Route 
+        path="/articles/:id" 
+        element={<ArticleDetail />} />
       </Routes>
     </BrowserRouter>
   );

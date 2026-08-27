@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import ThemeProvider from '../components/ThemeProvider';
 import Navbar from '../components/Navbar';
 import MainLayout from '../components/MainLayout';
@@ -24,88 +25,134 @@ export default function Articles() {
       });
   }, []);
 
-  // Filter out the featured article so we don't list it twice
+  // 1. Filter out the featured article
   const regularArticles = articles.filter(a => a.id !== featuredArticle?.id);
+
+  // 2. Dynamically group the remaining articles by their Category
+  const groupedArticles = regularArticles.reduce((groups, article) => {
+    // Because of our backend SQL JOIN, article.category holds the actual name!
+    const category = article.category || 'General';
+    if (!groups[category]) {
+      groups[category] = [];
+    }
+    groups[category].push(article);
+    return groups;
+  }, {});
+
+  // 3. Extract the category names so we can loop through them
+  const categories = Object.keys(groupedArticles);
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-slate-50 text-slate-900 transition-all duration-300 dark:bg-slate-950 dark:text-slate-100">
+      <div className="min-h-screen bg-slate-50 text-slate-900 transition-all duration-300 dark:bg-[#121212] dark:text-slate-100 font-sans">
         <Navbar />
 
         <MainLayout>
-          <main className="space-y-16 pb-16 pt-10 sm:pt-16">
+          <main className="space-y-16 pb-20 pt-10 sm:pt-16">
             
-            {/* Header */}
+            {/* Page Header */}
             <div className="border-b border-slate-200 pb-10 dark:border-slate-800">
-              <p className="text-sm font-medium uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+              <p className="text-sm font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
                 Insights & Tutorials
               </p>
-              <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl dark:text-white">
+              <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white">
                 Tech Articles
               </h1>
-              <p className="mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
+              <p className="mt-5 max-w-2xl text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
                 Deep dives into hardware integration, web frameworks, and digital transformation.
               </p>
             </div>
 
             {loading ? (
-              <div className="text-slate-500">Loading articles...</div>
+              <div className="text-slate-500 font-mono font-medium tracking-wide animate-pulse">Loading articles...</div>
             ) : (
               <>
-                {/* Featured Article Section */}
+                {/* --- HERO SECTION: Featured Article --- */}
                 {featuredArticle && (
                   <section className="space-y-6">
-                    <div className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-700 dark:border-amber-900/50 dark:bg-amber-900/20 dark:text-amber-400">
+                    <div className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-700 dark:border-amber-900/50 dark:bg-[#1a1a1c] dark:text-amber-400">
                       ⭐ Featured Read
                     </div>
                     
-                    <article className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-10 shadow-soft dark:border-slate-700 dark:bg-slate-900">
+                    <article className="rounded-3xl border border-slate-200 bg-white p-8 sm:p-12 shadow-sm transition-all hover:shadow-lg dark:border-slate-800 dark:bg-[#1a1a1c]">
                       <header className="mb-8">
-                        <h2 className="text-3xl font-bold text-slate-900 dark:text-white sm:text-4xl">{featuredArticle.title}</h2>
-                        <p className="mt-3 text-sm font-medium text-slate-500">{featuredArticle.date}</p>
+                        <div className="mb-4 inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                          {featuredArticle.category || 'General'}
+                        </div>
+                        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl md:text-5xl break-words leading-tight">
+                          {featuredArticle.title}
+                        </h2>
+                        <p className="mt-4 text-sm font-medium text-slate-500 dark:text-slate-400">
+                          {featuredArticle.date} • By Sean Brandon F. Reyes
+                        </p>
                       </header>
                       
-                      <div className="prose prose-slate max-w-none text-slate-700 dark:prose-invert dark:text-slate-300">
+                      <div className="prose prose-slate prose-lg max-w-none text-slate-700 dark:prose-invert dark:text-slate-300 line-clamp-4">
                         {featuredArticle.content.split('\n').map((paragraph, idx) => (
-                          paragraph.trim() && <p key={idx} className="mb-4 leading-relaxed text-lg">{paragraph}</p>
+                          paragraph.trim() && <p key={idx} className="mb-4 leading-relaxed break-words">{paragraph}</p>
                         ))}
                       </div>
 
-                      {featuredArticle.sources && (
-                        <div className="mt-10 border-t border-slate-100 pt-6 dark:border-slate-800">
-                          <h5 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Sources & References</h5>
-                          <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-slate-500">{featuredArticle.sources}</p>
-                        </div>
-                      )}
+                      <div className="mt-8 border-t border-slate-100 pt-6 dark:border-slate-800">
+                        <Link 
+                          to={`/articles/${featuredArticle.id}`} 
+                          className="inline-flex items-center rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800 dark:bg-white dark:text-[#121212] dark:hover:bg-slate-200"
+                        >
+                          Read Full Article →
+                        </Link>
+                      </div>
                     </article>
                   </section>
                 )}
 
-                {/* Regular Articles Feed */}
-                {regularArticles.length > 0 && (
-                  <section className="space-y-8 pt-10">
-                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">More Articles</h3>
-                    
-                    <div className="grid gap-8 sm:grid-cols-2">
-                      {regularArticles.map((article) => (
-                        <article key={article.id} className="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-soft transition-all hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-900">
-                          <p className="mb-3 text-sm font-medium text-slate-500">{article.date}</p>
-                          <h4 className="mb-4 text-xl font-bold text-slate-900 dark:text-white">{article.title}</h4>
-                          
-                          {/* Show a preview snippet (first 150 chars) of the article */}
-                          <p className="mb-6 line-clamp-3 text-base leading-relaxed text-slate-600 dark:text-slate-300">
-                            {article.content}
-                          </p>
+                {/* --- DYNAMIC CATEGORIES SECTION --- */}
+                {categories.length > 0 && (
+                  <div className="space-y-16 pt-10">
+                    {categories.map((category) => (
+                      <section key={category} className="space-y-8">
+                        
+                        {/* Category Header */}
+                        <div className="flex items-center gap-4">
+                          <h3 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                            {category}
+                          </h3>
+                          <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
+                        </div>
+                        
+                        {/* Category Articles Grid */}
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                          {groupedArticles[category].map((article) => (
+                            <article 
+                              key={article.id} 
+                              className="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
+                            >
+                              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                {article.date}
+                              </p>
+                              
+                              <h4 className="mb-3 text-xl font-bold tracking-tight text-slate-900 dark:text-white break-words leading-snug">
+                                {article.title}
+                              </h4>
+                              
+                              <p className="mb-6 line-clamp-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300 break-words flex-1">
+                                {article.content}
+                              </p>
 
-                          <div className="mt-auto border-t border-slate-100 pt-4 dark:border-slate-800">
-                            <button className="text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-                              Read Full Article →
-                            </button>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  </section>
+                              <div className="mt-auto border-t border-slate-100 pt-4 dark:border-slate-800 flex items-center justify-between">
+                                <Link 
+                                  to={`/articles/${article.id}`} 
+                                  className="text-sm font-bold text-blue-600 hover:text-blue-700 transition dark:text-blue-400 dark:hover:text-blue-300"
+                                >
+                                  Read Article →
+                                </Link>
+                              </div>
+                            </article>
+                          ))}
+                        </div>
+
+                      </section>
+                    ))}
+                  </div>
                 )}
               </>
             )}

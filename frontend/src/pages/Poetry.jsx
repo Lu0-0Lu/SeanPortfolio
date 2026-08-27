@@ -23,7 +23,7 @@ export default function Poetry() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-slate-50 text-slate-900 transition-all duration-300 dark:bg-slate-950 dark:text-slate-100">
+      <div className="min-h-screen bg-slate-50 text-slate-900 transition-all duration-300 dark:bg-[#121212] dark:text-slate-100">
         <Navbar />
 
         <MainLayout>
@@ -43,19 +43,20 @@ export default function Poetry() {
             </div>
 
             {loading ? (
-              <div className="text-center text-slate-500">Loading poetry...</div>
+              <div className="text-center text-slate-500 font-mono">Loading poetry...</div>
             ) : (
               <div className="mx-auto max-w-3xl space-y-12">
                 {poetry.length > 0 ? (
                   poetry.map((poem) => (
                     <article 
                       key={poem.id} 
-                      className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft transition-all hover:shadow-xl dark:border-slate-700 dark:bg-slate-900"
+                      className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft transition-all hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
                       style={poem.bg_image_url ? {
-                        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.95)), url(${poem.bg_image_url})`,
+                        // Notice the rgb colors are updated to match the deep #121212 aesthetic!
+                        backgroundImage: `linear-gradient(to bottom, rgba(18, 18, 18, 0.8), rgba(18, 18, 18, 0.98)), url(${poem.bg_image_url})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
-                        color: 'white' // Forces text to white if there's a background
+                        color: 'white' 
                       } : {}}
                     >
                       <div className={`p-8 sm:p-16 ${poem.bg_image_url ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
@@ -63,7 +64,6 @@ export default function Poetry() {
                           {poem.title}
                         </h2>
                         
-                        {/* whitespace-pre-line respects your exact line breaks from the database */}
                         <p className={`whitespace-pre-line text-center font-serif text-lg leading-loose sm:text-xl ${poem.bg_image_url ? 'text-slate-200' : 'text-slate-700 dark:text-slate-300'}`}>
                           {poem.content}
                         </p>
@@ -71,7 +71,7 @@ export default function Poetry() {
                     </article>
                   ))
                 ) : (
-                  <p className="text-center text-slate-500">No poetry published yet.</p>
+                  <p className="text-center text-slate-500 font-mono">No poetry published yet.</p>
                 )}
               </div>
             )}
