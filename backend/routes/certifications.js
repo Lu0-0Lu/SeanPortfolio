@@ -42,6 +42,30 @@ router.patch('/:id', auth, async (req, res) => {
   }
 });
 
+// PUT to update an existing certification
+router.put('/:id', auth, async (req, res) => {
+  const { title, issuer, date_issued, verification_link } = req.body;
+  const certId = req.params.id;
+
+  try {
+    const result = await db.query(
+      `UPDATE certifications 
+       SET title = $1, issuer = $2, date_issued = $3, verification_link = $4
+       WHERE id = $5 RETURNING *`,
+      [title, issuer, date_issued, verification_link || '#', certId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Certification not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update certification' });
+  }
+});
+
 // DELETE a certification
 router.delete('/:id', auth, async (req, res) => {
   try {

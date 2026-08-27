@@ -6,11 +6,12 @@ export default function ManageExperiences() {
   const [experiences, setExperiences] = useState([]);
   
   // Form State
+  const [editingId, setEditingId] = useState(null);
   const [role, setRole] = useState('');
   const [company, setCompany] = useState('');
   const [location, setLocation] = useState('');
   const [period, setPeriod] = useState('');
-  const [bullets, setBullets] = useState(['']); // Starts with 1 empty bullet input
+  const [bullets, setBullets] = useState(['']);
 
   const [popup, setPopup] = useState({ show: false, message: '', type: 'success' });
 
@@ -29,14 +30,42 @@ export default function ManageExperiences() {
     fetchExperiences();
   }, []);
 
-  const handleAddExperience = async (e) => {
+  // Populate form when Edit is clicked
+  const handleEdit = (exp) => {
+    setEditingId(exp.id);
+    setRole(exp.role);
+    setCompany(exp.company);
+    setLocation(exp.location);
+    setPeriod(exp.period);
+    setBullets(exp.bullets && exp.bullets.length > 0 ? exp.bullets : ['']);
+    
+    // Smooth scroll to the top of the form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Reset form
+  const resetForm = () => {
+    setEditingId(null);
+    setRole('');
+    setCompany('');
+    setLocation('');
+    setPeriod('');
+    setBullets(['']);
+  };
+
+  const handleSaveExperience = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('adminToken');
     const validBullets = bullets.filter(b => b.trim() !== '');
 
     try {
-      await fetch('http://localhost:5000/api/experiences', {
-        method: 'POST',
+      const url = editingId 
+        ? `http://localhost:5000/api/experiences/${editingId}` 
+        : 'http://localhost:5000/api/experiences';
+      const method = editingId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -44,15 +73,27 @@ export default function ManageExperiences() {
         body: JSON.stringify({ role, company, location, period, bullets: validBullets })
       });
 
-      setRole('');
-      setCompany('');
-      setLocation('');
-      setPeriod('');
-      setBullets(['']);
+      // Safely check if the response is actually JSON before parsing
+      const contentType = res.headers.get("content-type");
+      let errorMsg = 'Failed to save experience';
+
+      if (!res.ok) {
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+           const errData = await res.json();
+           errorMsg = errData.error || errorMsg;
+        } else {
+           errorMsg = `Server Error: ${res.status} ${res.statusText}`;
+        }
+        throw new Error(errorMsg);
+      }
+
+      const successMsg = editingId ? 'Experience successfully updated! ✏️' : 'Experience successfully added! 🎉';
+      
+      resetForm();
       fetchExperiences();
-      showNotification('Experience added successfully! 🎉');
+      showNotification(successMsg);
     } catch (err) {
-      showNotification('Failed to add experience.', 'error');
+      showNotification(`Error: ${err.message}`, 'error');
     }
   };
 
@@ -88,92 +129,202 @@ export default function ManageExperiences() {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
+
+    if (editingId === id) resetForm(); // Clear form if the deleted item was being edited
+
     fetchExperiences();
     showNotification('Experience deleted.', 'error');
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 dark:bg-slate-950 dark:text-slate-100 sm:p-10">
+    <div className="min-h-screen bg-slate-50 p-6 dark:bg-[#121212] dark:text-slate-100 sm:p-10 font-sans">
+      
+      {/* Toast Notification */}
       <div className={`fixed bottom-6 right-6 z-50 rounded-lg px-6 py-3 text-sm font-bold text-white shadow-xl transition-all duration-300 ${popup.show ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'} ${popup.type === 'error' ? 'bg-red-600' : 'bg-emerald-600'}`}>
         {popup.message}
       </div>
 
-      <div className="mx-auto max-w-4xl space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <button onClick={() => navigate('/admin')} className="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
-              ← Back to Dashboard
-            </button>
-            <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">Manage Experiences</h1>
-          </div>
+      <div className="mx-auto max-w-4xl space-y-10">
+        
+        {/* Header Area */}
+        <div>
+          <button 
+            onClick={() => navigate('/admin')} 
+            className="text-sm font-medium text-slate-500 hover:text-slate-900 transition dark:text-slate-400 dark:hover:text-white"
+          >
+            ← Back to Dashboard
+          </button>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            Manage Experiences
+          </h1>
         </div>
 
-        {/* Add Experience Form */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft dark:border-slate-700 dark:bg-slate-900">
-          <h2 className="mb-4 text-xl font-bold">Add New Work Experience</h2>
-          <form onSubmit={handleAddExperience} className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <input type="text" placeholder="Role / Job Title" required value={role} onChange={(e) => setRole(e.target.value)} className="w-full rounded-lg border border-slate-300 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-800" />
-              <input type="text" placeholder="Company / Organization" required value={company} onChange={(e) => setCompany(e.target.value)} className="w-full rounded-lg border border-slate-300 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-800" />
+        {/* Add / Edit Experience Form Card */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-[#1a1a1c]">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              {editingId ? 'Edit Work Experience' : 'Add New Work Experience'}
+            </h2>
+            {editingId && (
+              <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                Editing Mode Active
+              </span>
+            )}
+          </div>
+
+          <form onSubmit={handleSaveExperience} className="space-y-5">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <input 
+                type="text" 
+                placeholder="Role / Job Title" 
+                required 
+                value={role} 
+                onChange={(e) => setRole(e.target.value)} 
+                className="w-full rounded-xl border border-slate-200 bg-transparent px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:border-slate-700 dark:text-white dark:focus:border-slate-400 dark:focus:ring-slate-400" 
+              />
+              <input 
+                type="text" 
+                placeholder="Company / Organization" 
+                required 
+                value={company} 
+                onChange={(e) => setCompany(e.target.value)} 
+                className="w-full rounded-xl border border-slate-200 bg-transparent px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:border-slate-700 dark:text-white dark:focus:border-slate-400 dark:focus:ring-slate-400" 
+              />
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <input type="text" placeholder="Location (e.g., Quezon City)" required value={location} onChange={(e) => setLocation(e.target.value)} className="w-full rounded-lg border border-slate-300 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-800" />
-              <input type="text" placeholder="Period (e.g., Aug 2024 – Present)" required value={period} onChange={(e) => setPeriod(e.target.value)} className="w-full rounded-lg border border-slate-300 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-800" />
+            <div className="grid gap-5 sm:grid-cols-2">
+              <input 
+                type="text" 
+                placeholder="Location (e.g., Quezon City)" 
+                required 
+                value={location} 
+                onChange={(e) => setLocation(e.target.value)} 
+                className="w-full rounded-xl border border-slate-200 bg-transparent px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:border-slate-700 dark:text-white dark:focus:border-slate-400 dark:focus:ring-slate-400" 
+              />
+              <input 
+                type="text" 
+                placeholder="Period (e.g., Aug 2024 – Present)" 
+                required 
+                value={period} 
+                onChange={(e) => setPeriod(e.target.value)} 
+                className="w-full rounded-xl border border-slate-200 bg-transparent px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:border-slate-700 dark:text-white dark:focus:border-slate-400 dark:focus:ring-slate-400" 
+              />
             </div>
 
             {/* Dynamic Bullet Points */}
-            <div className="space-y-3">
-              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Key Responsibilities / Bullet Points</label>
+            <div className="space-y-3 pt-2">
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Key Responsibilities / Bullet Points</label>
               {bullets.map((bullet, index) => (
-                <input 
-                  key={index} 
-                  type="text" 
-                  placeholder={`Bullet point ${index + 1}`} 
-                  value={bullet} 
-                  onChange={(e) => {
-                    const newBullets = [...bullets];
-                    newBullets[index] = e.target.value;
-                    setBullets(newBullets);
-                  }} 
-                  className="w-full rounded-lg border border-slate-300 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-800" 
-                />
+                <div key={index} className="flex gap-2">
+                  <input 
+                    type="text" 
+                    placeholder={`Bullet point ${index + 1}`} 
+                    value={bullet} 
+                    onChange={(e) => {
+                      const newBullets = [...bullets];
+                      newBullets[index] = e.target.value;
+                      setBullets(newBullets);
+                    }} 
+                    className="w-full rounded-xl border border-slate-200 bg-transparent px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:border-slate-700 dark:text-white dark:focus:border-slate-400 dark:focus:ring-slate-400" 
+                  />
+                  {bullets.length > 1 && (
+                    <button 
+                      type="button" 
+                      onClick={() => setBullets(bullets.filter((_, i) => i !== index))}
+                      className="shrink-0 rounded-xl px-4 text-slate-400 hover:bg-red-50 hover:text-red-600 transition dark:hover:bg-red-900/30 dark:hover:text-red-400"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
               ))}
-              <button type="button" onClick={() => setBullets([...bullets, ''])} className="text-sm font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400">
+              <button 
+                type="button" 
+                onClick={() => setBullets([...bullets, ''])} 
+                className="mt-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition dark:text-emerald-400 dark:hover:text-emerald-300"
+              >
                 + Add another bullet point
               </button>
             </div>
 
-            <button type="submit" className="rounded-full bg-slate-900 px-6 py-2.5 font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-slate-900">
-              Save Experience
-            </button>
+            <div className="flex items-center gap-4 pt-4">
+              <button 
+                type="submit" 
+                className="rounded-full bg-slate-900 px-8 py-3 text-sm font-bold text-white transition hover:bg-slate-800 dark:bg-white dark:text-[#121212] dark:hover:bg-slate-200"
+              >
+                {editingId ? 'Update Experience' : 'Save Experience'}
+              </button>
+              
+              {editingId && (
+                <button 
+                  type="button" 
+                  onClick={resetForm}
+                  className="rounded-full border border-slate-300 bg-transparent px-8 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-400 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
         {/* Current Experiences List */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold">Current Experiences & Arrangement</h2>
-          {experiences.map((item, index) => (
-            <div key={item.id} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
-              <div>
-                <h3 className="font-bold">{item.role} <span className="font-normal text-slate-500">at {item.company}</span></h3>
-                <p className="text-sm text-slate-500">{item.period}</p>
-              </div>
+        <div className="space-y-5">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Current Experiences & Arrangement</h2>
+          
+          <div className="space-y-4">
+            {experiences.map((item, index) => (
+              <div 
+                key={item.id} 
+                className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-[#1a1a1c]"
+              >
+                {/* LEFT SIDE: Text Content (Flex-1 and min-w-0 for wrapping) */}
+                <div className="flex-1 min-w-0 sm:pr-4">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                    {item.role} <span className="font-normal text-slate-500 dark:text-slate-400">at {item.company}</span>
+                  </h3>
+                  <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+                    {item.period} • {item.location}
+                  </p>
+                </div>
 
-              <div className="flex items-center gap-2">
-                <button onClick={() => handleMove(index, 'up')} disabled={index === 0} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 disabled:opacity-40 dark:bg-slate-800 dark:text-slate-300">
-                  ↑ Up
-                </button>
-                <button onClick={() => handleMove(index, 'down')} disabled={index === experiences.length - 1} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 disabled:opacity-40 dark:bg-slate-800 dark:text-slate-300">
-                  ↓ Down
-                </button>
-                <button onClick={() => handleDelete(item.id)} className="rounded-full bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400">
-                  Delete
-                </button>
+                {/* RIGHT SIDE: Buttons (Shrink-0 to prevent squishing) */}
+                <div className="flex flex-wrap items-center gap-2 shrink-0 sm:justify-end">
+                  <button 
+                    onClick={() => handleEdit(item)} 
+                    className="rounded-full bg-blue-50 px-4 py-2 text-xs font-bold text-blue-600 transition hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40"
+                  >
+                    Edit
+                  </button>
+                  
+                  <button 
+                    onClick={() => handleMove(index, 'up')} 
+                    disabled={index === 0} 
+                    className="rounded-full bg-slate-100 px-4 py-2 text-xs font-bold text-slate-600 transition hover:bg-slate-200 disabled:opacity-40 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                  >
+                    ↑ Up
+                  </button>
+                  
+                  <button 
+                    onClick={() => handleMove(index, 'down')} 
+                    disabled={index === experiences.length - 1} 
+                    className="rounded-full bg-slate-100 px-4 py-2 text-xs font-bold text-slate-600 transition hover:bg-slate-200 disabled:opacity-40 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                  >
+                    ↓ Down
+                  </button>
+                  
+                  <button 
+                    onClick={() => handleDelete(item.id)} 
+                    className="rounded-full bg-red-50 px-4 py-2 text-xs font-bold text-red-600 transition hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
       </div>
     </div>
   );

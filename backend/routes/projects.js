@@ -56,6 +56,35 @@ router.patch('/:id', auth, async (req, res) => {
   }
 });
 
+// PUT to update an existing project
+router.put('/:id', auth, async (req, res) => {
+  const { title, description, video_url, images, is_featured } = req.body;
+  const projectId = req.params.id;
+
+  try {
+    // If this project is being set as featured, unfeature all others first
+    if (is_featured) {
+      await db.query('UPDATE projects SET is_featured = false');
+    }
+
+    const result = await db.query(
+      `UPDATE projects 
+       SET title = $1, description = $2, video_url = $3, images = $4, is_featured = $5
+       WHERE id = $6 RETURNING *`,
+      [title, description, video_url || null, images || [], is_featured || false, projectId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update project' });
+  }
+});
+
 // DELETE a project
 router.delete('/:id', auth, async (req, res) => {
   try {
