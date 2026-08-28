@@ -33,7 +33,7 @@ export default function Navbar() {
           onClick={(e) => handleNavigation(e, '/')}
           className="text-lg font-bold tracking-tight text-slate-900 dark:text-white"
         >
-          Sean Brandon F. Reyes
+          Sean Brandon Reyes
         </a>
 
         <div className="flex items-center gap-4 md:gap-6">

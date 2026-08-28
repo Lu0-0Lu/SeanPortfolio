@@ -50,7 +50,7 @@ export default function Books() {
                   books.map((book) => (
                     <article key={book.id} className="flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft transition-all hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]">
                       
-                      {/* FIXED: Correctly referencing cover_image_url */}
+                      {/* Referencing cover_image_url */}
                       {book.cover_image_url && (
                         <div className="h-64 w-full overflow-hidden bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
                           <img 

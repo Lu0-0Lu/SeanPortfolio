@@ -5,7 +5,7 @@ export default function Footer() {
     <footer id="contact" className="border-t border-slate-200 dark:border-slate-700">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <div className="flex flex-col gap-2">
-          <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Sean Brandon F. Reyes</p>
+          <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Sean Brandon Reyes</p>
           <p className="text-sm text-slate-600 dark:text-slate-400">© 2026 All rights reserved.</p>
         </div>
         
