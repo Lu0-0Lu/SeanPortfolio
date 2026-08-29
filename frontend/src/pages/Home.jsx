@@ -18,7 +18,7 @@ export default function Home() {
   ];
 
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
-  const [displayedText, setDisplayedText] = useState(phrases[0]); // Initialize directly so it's never blank
+  const [displayedText, setDisplayedText] = useState(phrases[0]); 
   const [isDeleting, setIsDeleting] = useState(false);
   const [typingSpeed, setTypingSpeed] = useState(150);
 
@@ -74,38 +74,46 @@ export default function Home() {
         <Navbar />
 
         <MainLayout>
-          <main className="space-y-24 pb-20 pt-16 sm:pt-24">
+          <main className="space-y-24 pb-20 pt-16 sm:pt-16">
             
-            {/* --- 1. ORIGINAL HERO SECTION --- */}
-            <section className="grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-              <div className="space-y-6">
-                <p className="text-sm font-medium uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                  Project Management / Developer / Technologist
-                </p>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl leading-[1.15] dark:text-white">
-                  Building technologies and delivering IT solutions that streamline operations.
-                </h1>
-                <p className="max-w-xl text-base leading-7 text-slate-600 sm:text-lg dark:text-slate-300">
-                  I’m Sean Brandon Reyes, a technology-focused professional interested in web applications, 
-                  backend development, SQL databases, IT and systems support, embedded technologies, and meaningful digital transformation.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <button 
-                    onClick={() => navigate('/projects')}
-                    className="rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-[#121212]"
-                  >
-                    View Projects
-                  </button>
-                  <button 
-                    onClick={() => navigate('/contact')}
-                    className="rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-100"
-                  >
-                    Contact Me
-                  </button>
+              {/* --- 1. HERO SECTION --- */}
+                {/* Added 'isolate' to keep the -z-10 glow from hiding behind the main background */}
+                <section className="relative isolate grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+                  
+                 {/* --- FAST CSS BACKGROUND ANIMATION --- */}
+                <div className="absolute inset-0 -z-10 flex justify-center overflow-visible pointer-events-none">
+                  <div className="absolute -top-[20%] h-[500px] w-[800px] rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/20 via-blue-900/5 to-transparent blur-3xl dark:from-blue-600/20 dark:via-blue-900/5"></div>
                 </div>
-              </div>
 
-              {/* Featured Work Card (Prioritizing Video Link if available) */}
+                  {/* --- ORIGINAL CONTENT --- */}
+                  <div className="space-y-6">
+                    <p className="text-sm font-medium uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+                      Project Management / Developer / Technologist
+                    </p>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl leading-[1.15] dark:text-white">
+                      Building technologies and delivering IT solutions that streamline operations.
+                    </h1>
+                    <p className="max-w-xl text-base leading-7 text-slate-600 sm:text-lg dark:text-slate-300">
+                      I’m Sean Brandon Reyes, a technology-focused professional interested in web applications, 
+                      backend development, SQL databases, IT and systems support, embedded technologies, and meaningful digital transformation.
+                    </p>
+                    <div className="flex flex-wrap gap-4 pt-2">
+                      <button 
+                        onClick={() => navigate('/projects')}
+                        className="rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-[#121212]"
+                      >
+                        View Projects
+                      </button>
+                      <button 
+                        onClick={() => navigate('/contact')}
+                        className="rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-100"
+                      >
+                        Contact Me
+                      </button>
+                    </div>
+                  </div>
+
+              {/* Featured Work Card */}
               <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]">
                 <div className="flex items-center justify-between border-b border-slate-200 bg-slate-100 px-5 py-3 dark:border-slate-800 dark:bg-[#121212]">
                   <div className="flex items-center space-x-2">
@@ -128,17 +136,17 @@ export default function Home() {
 
                       {/* Video Link Prioritization */}
                       {featuredProject.video_url || featuredProject.videoUrl || featuredProject.video ? (
-                        <div className="overflow-hidden rounded-2xl border border-slate-200 h-40 shadow-sm dark:border-slate-700 mt-4 bg-black flex items-center justify-center">
+                        <div className="overflow-hidden rounded-2xl border border-slate-200 aspect-video w-full shadow-sm dark:border-slate-700 mt-6 bg-black flex items-center justify-center">
                           <iframe 
                             src={featuredProject.video_url || featuredProject.videoUrl || featuredProject.video} 
                             title={featuredProject.title}
                             className="h-full w-full object-cover"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
-                          />
+                          ></iframe>
                         </div>
                       ) : featuredProject.images && featuredProject.images.length > 0 ? (
-                        <div className="overflow-hidden rounded-2xl border border-slate-200 h-40 shadow-sm dark:border-slate-700 mt-4">
+                        <div className="overflow-hidden rounded-2xl border border-slate-200 aspect-video w-full shadow-sm dark:border-slate-700 mt-6">
                           <img 
                             src={featuredProject.images[0]} 
                             alt="Featured preview" 
@@ -155,7 +163,7 @@ export default function Home() {
             </section>
 
             {/* --- 2. TERMINAL AESTHETIC / HI I'M SEAN SECTION --- */}
-            <section className="border-t border-slate-200 pt-20 dark:border-slate-800">
+            <section className="border-t border-slate-200 pt-15 dark:border-slate-800">
               <div className="grid items-center gap-12 lg:grid-cols-[1fr_0.8fr]">
                 <div className="space-y-8">
                   {/* Static "Hi — " with typing dynamic suffix & permanent blinking cursor */}
@@ -182,7 +190,7 @@ export default function Home() {
                   {/* Subtle ambient backlight */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-80 w-80 rounded-full bg-blue-600/10 blur-3xl transition-all duration-500 pointer-events-none group-hover:bg-blue-500/25"></div>
 
-                  {/* Removed the rectangular clipping and box-shadow, replaced with a silhouette drop-shadow */}
+                  {/* Silhouette drop-shadow */}
                   <div className="animate-float profile-pop relative w-full max-w-[380px] lg:max-w-[420px] cursor-pointer drop-shadow-xl">
                     <img 
                       src={profileImage} 
@@ -237,7 +245,7 @@ export default function Home() {
                 >
                   <div className="uiverse-icon mb-4 flex h-20 w-20 items-center justify-center rounded-full transition-all duration-700">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-700 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                   </div>
                   <h3 className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-slate-900 dark:text-white">Library</h3>

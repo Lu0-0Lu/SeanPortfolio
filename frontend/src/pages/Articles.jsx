@@ -30,7 +30,6 @@ export default function Articles() {
 
   // 2. Dynamically group the remaining articles by their Category
   const groupedArticles = regularArticles.reduce((groups, article) => {
-    // Because of our backend SQL JOIN, article.category holds the actual name!
     const category = article.category || 'General';
     if (!groups[category]) {
       groups[category] = [];
@@ -48,25 +47,25 @@ export default function Articles() {
         <Navbar />
 
         <MainLayout>
-          <main className="space-y-16 pb-20 pt-10 sm:pt-16">
+          <main className="mx-auto max-w-6xl space-y-16 pb-20 pt-16 sm:pt-15">
             
             {/* Page Header */}
-            <div className="border-b border-slate-200 pb-10 dark:border-slate-800">
+            <div className="border-b border-slate-200 pb-6 dark:border-slate-800">
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
                 Insights & Tutorials
               </p>
-              <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white">
+              <h1 className="mt-2 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl dark:text-white">
                 Tech Articles
               </h1>
-              <p className="mt-5 max-w-2xl text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="mt-3 max-w-2xl text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
                 Deep dives into hardware integration, web frameworks, and digital transformation.
               </p>
             </div>
 
             {loading ? (
-              <div className="text-slate-500 font-mono font-medium tracking-wide animate-pulse">Loading articles...</div>
+              <p className="font-mono text-slate-500">Loading articles...</p>
             ) : (
-              <>
+              <div className="space-y-16">
                 {/* --- HERO SECTION: Featured Article --- */}
                 {featuredArticle && (
                   <section className="space-y-6">
@@ -74,29 +73,32 @@ export default function Articles() {
                       ⭐ Featured Read
                     </div>
                     
-                    <article className="rounded-3xl border border-slate-200 bg-white p-8 sm:p-12 shadow-sm transition-all hover:shadow-lg dark:border-slate-800 dark:bg-[#1a1a1c]">
-                      <header className="mb-8">
+                    <article className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-10 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c] ring-1 ring-amber-500/10 dark:ring-amber-500/5">
+                      <header className="mb-6">
                         <div className="mb-4 inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                           {featuredArticle.category || 'General'}
                         </div>
-                        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl md:text-5xl break-words leading-tight">
+                        {/* CRASH FIX: Removed the invalid featuredProject variable */}
+                        {/* SIZE FIX: Scaled down to match Projects layout */}
+                        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl break-words leading-tight">
                           {featuredArticle.title}
                         </h2>
-                        <p className="mt-4 text-sm font-medium text-slate-500 dark:text-slate-400">
+                        <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">
                           {featuredArticle.date} • By Sean Brandon F. Reyes
                         </p>
                       </header>
                       
-                      <div className="prose prose-slate prose-lg max-w-none text-slate-700 dark:prose-invert dark:text-slate-300 line-clamp-4">
+                      {/* SIZE FIX: Normalized text sizes from text-lg to text-sm sm:text-base */}
+                      <div className="text-slate-700 dark:text-slate-300 leading-relaxed text-sm sm:text-base line-clamp-4">
                         {featuredArticle.content.split('\n').map((paragraph, idx) => (
-                          paragraph.trim() && <p key={idx} className="mb-4 leading-relaxed break-words">{paragraph}</p>
+                          paragraph.trim() && <p key={idx} className="mb-4 last:mb-0 break-words">{paragraph}</p>
                         ))}
                       </div>
 
                       <div className="mt-8 border-t border-slate-100 pt-6 dark:border-slate-800">
                         <Link 
                           to={`/articles/${featuredArticle.id}`} 
-                          className="inline-flex items-center rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800 dark:bg-white dark:text-[#121212] dark:hover:bg-slate-200"
+                          className="inline-flex items-center rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white transition hover:opacity-90 dark:bg-white dark:text-[#121212]"
                         >
                           Read Full Article →
                         </Link>
@@ -107,7 +109,7 @@ export default function Articles() {
 
                 {/* --- DYNAMIC CATEGORIES SECTION --- */}
                 {categories.length > 0 && (
-                  <div className="space-y-16 pt-10">
+                  <div className="space-y-16 pt-4">
                     {categories.map((category) => (
                       <section key={category} className="space-y-8">
                         
@@ -124,7 +126,7 @@ export default function Articles() {
                           {groupedArticles[category].map((article) => (
                             <article 
                               key={article.id} 
-                              className="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
+                              className="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
                             >
                               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 {article.date}
@@ -154,7 +156,7 @@ export default function Articles() {
                     ))}
                   </div>
                 )}
-              </>
+              </div>
             )}
 
           </main>
