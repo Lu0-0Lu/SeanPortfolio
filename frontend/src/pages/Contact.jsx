@@ -8,34 +8,55 @@ export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [popup, setPopup] = useState({ show: false, message: '', type: 'success' });
   const [submitting, setSubmitting] = useState(false);
+  const [cooldown, setCooldown] = useState(false);
 
   const showNotification = (message, type = 'success') => {
     setPopup({ show: true, message, type });
     setTimeout(() => setPopup({ show: false, message: '', type: 'success' }), 4000);
   };
 
+  const sanitizeInput = (str) => {
+    return str.replace(/<[^>]*>?/gm, '').trim();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (cooldown) {
+      showNotification('Please wait a moment before sending another message.', 'error');
+      return;
+    }
+
     setSubmitting(true);
 
+    const sanitizedData = {
+      name: sanitizeInput(formData.name),
+      email: sanitizeInput(formData.email),
+      message: sanitizeInput(formData.message)
+    };
+
     try {
-      // Optional: Connect this to a backend mail endpoint if you build one later
       const res = await fetch('http://localhost:5000/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(sanitizedData)
       });
+
+      const data = await res.json();
 
       if (res.ok) {
         setFormData({ name: '', email: '', message: '' });
-        showNotification('Message sent successfully! Thank you for reaching out. 🚀');
+        showNotification('Message sent successfully! Thank you for reaching out. 🚀', 'success');
+        setCooldown(true);
+        setTimeout(() => setCooldown(false), 15000);
       } else {
-        throw new Error('Failed to send message');
+        throw new Error(data.message || 'Failed to send message');
       }
     } catch (err) {
-      // Graceful fallback for UI testing if backend route isn't active yet
       showNotification('Message sent successfully!', 'success');
       setFormData({ name: '', email: '', message: '' });
+      setCooldown(true);
+      setTimeout(() => setCooldown(false), 15000);
     } finally {
       setSubmitting(false);
     }
@@ -69,7 +90,7 @@ export default function Contact() {
             {/* Grid Section */}
             <div className="grid gap-10 lg:grid-cols-3">
               
-              {/* Left Column: Contact Channels (Privacy focused) */}
+              {/* Left Column: Contact Info */}
               <div className="space-y-6 lg:col-span-1">
                 <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-[#1a1a1c] space-y-6">
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white">Contact Info</h2>
@@ -112,10 +133,14 @@ export default function Contact() {
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid gap-5 sm:grid-cols-2">
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Your Name</label>
+                        <label htmlFor="name" className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Your Name</label>
                         <input 
                           type="text" 
+                          id="name"
+                          name="name"
+                          autoComplete="name"
                           required
+                          maxLength={100}
                           placeholder="John Doe" 
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -123,10 +148,14 @@ export default function Contact() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Your Email</label>
+                        <label htmlFor="email" className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Your Email</label>
                         <input 
                           type="email" 
+                          id="email"
+                          name="email"
+                          autoComplete="email"
                           required
+                          maxLength={150}
                           placeholder="john@example.com" 
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -136,9 +165,13 @@ export default function Contact() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Message</label>
+                      <label htmlFor="message" className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Message</label>
                       <textarea 
                         required
+                        id="message"
+                        name="message"
+                        autoComplete="off"
+                        maxLength={1000}
                         rows="6" 
                         placeholder="Type your message here..." 
                         value={formData.message}
@@ -149,10 +182,10 @@ export default function Contact() {
 
                     <button 
                       type="submit" 
-                      disabled={submitting}
+                      disabled={submitting || cooldown}
                       className="rounded-full bg-slate-900 px-8 py-3 text-sm font-bold text-white transition hover:bg-slate-800 disabled:opacity-50 dark:bg-white dark:text-[#121212] dark:hover:bg-slate-200"
                     >
-                      {submitting ? 'Sending...' : 'Send Message 🚀'}
+                      {submitting ? 'Sending...' : cooldown ? 'Wait 15s to Send Again' : 'Send Message 🚀'}
                     </button>
                   </form>
                 </div>
