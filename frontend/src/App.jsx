@@ -16,6 +16,7 @@ import ManageBookCategories from './pages/ManageBookCategories';
 
 import Articles from './pages/Articles';
 import Books from './pages/Books';
+import BookDetail from './pages/BookDetail';
 import Poetry from './pages/Poetry';
 import About from './pages/About';
 import Projects from './pages/Projects';
@@ -119,6 +120,11 @@ export default function App() {
         <Route 
         path="/articles/:id" 
         element={<ArticleDetail />} />
+
+        {/* Book Detail Page */}
+        <Route 
+        path="/books/:id" 
+        element={<BookDetail />} />
       </Routes>
     </BrowserRouter>
   );

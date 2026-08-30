@@ -42,6 +42,9 @@ app.use('/api/categories', require('./routes/categories'));
 app.use('/api/book-categories', require('./routes/bookCategories'));
 app.use('/api/book-tags', require('./routes/bookTags'));
 
+// --- CONTACT ROUTE ---
+app.use('/api/contact', require('./routes/contact'));
+
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

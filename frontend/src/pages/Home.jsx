@@ -163,19 +163,24 @@ export default function Home() {
             </section>
 
             {/* --- 2. TERMINAL AESTHETIC / HI I'M SEAN SECTION --- */}
-            <section className="border-t border-slate-200 pt-15 dark:border-slate-800">
-              <div className="grid items-center gap-12 lg:grid-cols-[1fr_0.8fr]">
-                <div className="space-y-8">
-                  {/* Static "Hi — " with typing dynamic suffix & permanent blinking cursor */}
+            <section className="border-t border-slate-200 pt-12 sm:pt-16 dark:border-slate-800">
+              <div className="grid items-center gap-10 lg:grid-cols-[1fr_0.8fr]">
+                
+                <div className="space-y-6 sm:space-y-8">
+                  {/* 
+                    NATURAL DYNAMIC HEADER: 
+                    No invisible hacks, no min-heights. The browser naturally handles the spacing.
+                    Added a subtle blue tint to the typed text to make it pop!
+                  */}
                   <h2 className="font-mono text-4xl font-bold tracking-tight sm:text-5xl dark:text-white">
-                    Hi — <span className="terminal-cursor">{displayedText}</span>
+                    Hi — <span className="text-blue-600 dark:text-blue-400">{displayedText}</span><span className="terminal-cursor text-slate-900 dark:text-white"></span>
                   </h2>
                   
                   <p className="font-mono text-base leading-relaxed text-slate-700 sm:text-lg dark:text-slate-300">
                     I thrive in dynamic environments where adaptability is key, seamlessly transitioning between developing accessible web applications and architecting backend software. Combining this versatile skill set with a strong foundation in project management and IT and system support, I guide technical builds from initial planning through to deployment and ongoing maintenance. Beyond full-stack development, my expertise extends to embedded systems, utilizing microcontrollers like Arduino and Raspberry Pi to bridge the gap between digital servers and physical hardware. I specialize in engineering practical, automated technologies that deliver tangible, real-world impact.
                   </p>
                   
-                  <div className="flex flex-wrap gap-4 pt-4">
+                  <div className="flex flex-wrap gap-4 pt-2">
                     <button 
                       onClick={() => navigate('/about')}
                       className="rounded-none border-2 border-slate-900 bg-slate-900 px-6 py-3 font-mono text-sm font-bold text-white transition hover:bg-transparent hover:text-slate-900 dark:border-white dark:bg-white dark:text-[#121212] dark:hover:bg-transparent dark:hover:text-white"
@@ -186,92 +191,96 @@ export default function Home() {
                 </div>
 
                 {/* Profile Image Area */}
-                <div className="relative mx-auto w-full max-w-md flex justify-center py-6 group">
+                <div className="relative mx-auto w-full max-w-md flex justify-center py-6 group -mt-10 lg:-mt-28">
+                  
                   {/* Subtle ambient backlight */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-80 w-80 rounded-full bg-blue-600/10 blur-3xl transition-all duration-500 pointer-events-none group-hover:bg-blue-500/25"></div>
 
                   {/* Silhouette drop-shadow */}
                   <div className="animate-float profile-pop relative w-full max-w-[380px] lg:max-w-[420px] cursor-pointer drop-shadow-xl">
+                    {/* Pushed the fade start to 88% so only the bottom edge gracefully melts away */}
                     <img 
                       src={profileImage} 
                       alt="Sean Brandon F. Reyes" 
-                      className="h-auto w-full object-contain transition-transform duration-700 hover:scale-105"
+                      className="h-auto w-full object-contain transition-transform duration-700 hover:scale-105 [-webkit-mask-image:linear-gradient(to_bottom,black_88%,transparent_100%)] [mask-image:linear-gradient(to_bottom,black_88%,transparent_100%)]"
                     />
                   </div>
+                  
                 </div>
+
               </div>
             </section>
 
             {/* --- 3. GATEWAY / SHORTCUT CARDS --- */}
-            <section className="border-t border-slate-200 pt-16 dark:border-slate-800">
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                
-                {/* Projects Card */}
-                <div 
-                  onClick={() => navigate('/projects')}
-                  className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:h-[270px] dark:border-slate-800 dark:bg-[#1a1a1c]"
-                >
-                  <div className="uiverse-icon mb-4 flex h-20 w-20 items-center justify-center rounded-full transition-all duration-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-700 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                    </svg>
+              <section className="border-t border-slate-200 pt-16 dark:border-slate-800">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                  
+                  {/* Projects Card */}
+                  <div 
+                    onClick={() => navigate('/projects')}
+                    className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
+                  >
+                    <div className="uiverse-icon mb-4 flex h-20 w-20 items-center justify-center rounded-full transition-all duration-500 group-hover:-translate-y-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-700 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                      </svg>
+                    </div>
+                    <h3 className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-slate-900 dark:text-white transition-transform duration-500 group-hover:-translate-y-1">Projects</h3>
+                    <p className="uiverse-text absolute bottom-6 px-6 text-xs font-light tracking-wider text-slate-600 opacity-0 transition-all duration-500 group-hover:opacity-100 dark:text-slate-300">
+                      View my hardware and software builds.
+                    </p>
                   </div>
-                  <h3 className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-slate-900 dark:text-white">Projects</h3>
-                  <p className="uiverse-text text-xs font-light tracking-wider text-slate-600 dark:text-slate-300">
-                    View my hardware and software builds.
-                  </p>
-                </div>
 
-                {/* Articles Card */}
-                <div 
-                  onClick={() => navigate('/articles')}
-                  className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:h-[270px] dark:border-slate-800 dark:bg-[#1a1a1c]"
-                >
-                  <div className="uiverse-icon mb-4 flex h-20 w-20 items-center justify-center rounded-full transition-all duration-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-700 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                    </svg>
+                  {/* Articles Card */}
+                  <div 
+                    onClick={() => navigate('/articles')}
+                    className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
+                  >
+                    <div className="uiverse-icon mb-4 flex h-20 w-20 items-center justify-center rounded-full transition-all duration-500 group-hover:-translate-y-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-700 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-slate-900 dark:text-white transition-transform duration-500 group-hover:-translate-y-1">Articles</h3>
+                    <p className="uiverse-text absolute bottom-6 px-6 text-xs font-light tracking-wider text-slate-600 opacity-0 transition-all duration-500 group-hover:opacity-100 dark:text-slate-300">
+                      Technical insights and tutorials.
+                    </p>
                   </div>
-                  <h3 className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-slate-900 dark:text-white">Articles</h3>
-                  <p className="uiverse-text text-xs font-light tracking-wider text-slate-600 dark:text-slate-300">
-                    Technical insights and tutorials.
-                  </p>
-                </div>
 
-                {/* Library Card */}
-                <div 
-                  onClick={() => navigate('/books')}
-                  className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:h-[270px] dark:border-slate-800 dark:bg-[#1a1a1c]"
-                >
-                  <div className="uiverse-icon mb-4 flex h-20 w-20 items-center justify-center rounded-full transition-all duration-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-700 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
+                  {/* Library Card */}
+                  <div 
+                    onClick={() => navigate('/books')}
+                    className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
+                  >
+                    <div className="uiverse-icon mb-4 flex h-20 w-20 items-center justify-center rounded-full transition-all duration-500 group-hover:-translate-y-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-700 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                      </svg>
+                    </div>
+                    <h3 className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-slate-900 dark:text-white transition-transform duration-500 group-hover:-translate-y-1">Library</h3>
+                    <p className="uiverse-text absolute bottom-6 px-6 text-xs font-light tracking-wider text-slate-600 opacity-0 transition-all duration-500 group-hover:opacity-100 dark:text-slate-300">
+                      Reviews of literature and philosophy.
+                    </p>
                   </div>
-                  <h3 className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-slate-900 dark:text-white">Library</h3>
-                  <p className="uiverse-text text-xs font-light tracking-wider text-slate-600 dark:text-slate-300">
-                    Reviews of literature and philosophy.
-                  </p>
-                </div>
 
-                {/* Poetry Card */}
-                <div 
-                  onClick={() => navigate('/poetry')}
-                  className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:h-[270px] dark:border-slate-800 dark:bg-[#1a1a1c]"
-                >
-                  <div className="uiverse-icon mb-4 flex h-20 w-20 items-center justify-center rounded-full transition-all duration-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-700 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
+                  {/* Poetry Card */}
+                  <div 
+                    onClick={() => navigate('/poetry')}
+                    className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
+                  >
+                    <div className="uiverse-icon mb-4 flex h-20 w-20 items-center justify-center rounded-full transition-all duration-500 group-hover:-translate-y-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-700 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-slate-900 dark:text-white transition-transform duration-500 group-hover:-translate-y-1">Poetry</h3>
+                    <p className="uiverse-text absolute bottom-6 px-6 text-xs font-light tracking-wider text-slate-600 opacity-0 transition-all duration-500 group-hover:opacity-100 dark:text-slate-300">
+                      Creative writing and reflections.
+                    </p>
                   </div>
-                  <h3 className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-slate-900 dark:text-white">Poetry</h3>
-                  <p className="uiverse-text text-xs font-light tracking-wider text-slate-600 dark:text-slate-300">
-                    Creative writing and reflections.
-                  </p>
-                </div>
 
-              </div>
-            </section>
+                </div>
+              </section>
 
           </main>
         </MainLayout>
