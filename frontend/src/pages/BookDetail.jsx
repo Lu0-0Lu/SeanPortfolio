@@ -11,9 +11,11 @@ export default function BookDetail() {
   const [book, setBook] = useState(null);
   const [tagsList, setTagsList] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // State for the guaranteed slide-up animation
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Fetch both the specific book and the tags dictionary simultaneously
     const fetchData = async () => {
       try {
         const [bookRes, tagsRes] = await Promise.all([
@@ -25,6 +27,8 @@ export default function BookDetail() {
         if (tagsRes.ok) setTagsList(await tagsRes.json());
         
         setLoading(false);
+        // Trigger the animation shortly after the data renders into the DOM
+        setTimeout(() => setIsLoaded(true), 50);
       } catch (err) {
         console.error('Failed to fetch book details:', err);
         setLoading(false);
@@ -42,7 +46,6 @@ export default function BookDetail() {
         <MainLayout>
           <main className="mx-auto max-w-6xl pb-20 pt-24 sm:pt-24">
             
-            {/* Back Navigation */}
             <button 
               onClick={() => navigate('/books')}
               className="group mb-12 flex items-center gap-2 text-sm font-bold tracking-wider text-slate-500 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white uppercase"
@@ -55,22 +58,22 @@ export default function BookDetail() {
             ) : !book ? (
               <p className="font-mono text-slate-500">Book not found.</p>
             ) : (
-              <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
+              <div 
+                className={`flex flex-col lg:flex-row gap-12 lg:gap-20 transition-all duration-[800ms] ease-out ${
+                  isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                }`}
+              >
                 
-                {/* LEFT COLUMN: Sticky Book Cover & Metadata */}
                 <div className="lg:w-5/12 shrink-0">
                   <div className="sticky top-32 flex flex-col gap-6">
                     
-                    {/* The Physical Book Container */}
                     <div className="relative flex h-[450px] w-full items-center justify-center overflow-hidden rounded-3xl bg-slate-100 p-8 shadow-inner dark:bg-[#1a1a1c] border border-slate-200 dark:border-slate-800">
-                      {/* Blurred Background */}
                       {book.cover_image_url && (
                         <div 
                           className="absolute inset-0 opacity-40 blur-3xl dark:opacity-20"
                           style={{ backgroundImage: `url(${book.cover_image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                         ></div>
                       )}
-                      {/* Physical Book Floating */}
                       {book.cover_image_url && (
                         <img 
                           src={book.cover_image_url} 
@@ -80,7 +83,6 @@ export default function BookDetail() {
                       )}
                     </div>
 
-                    {/* Quick Stats Grid */}
                     <div className="grid grid-cols-2 gap-4 border-t border-slate-200 pt-6 dark:border-slate-800">
                       <div>
                         <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Category</p>
@@ -92,7 +94,6 @@ export default function BookDetail() {
                       </div>
                     </div>
 
-                    {/* INJECTED: Book Tags Section */}
                     {book.tag_ids && book.tag_ids.length > 0 && tagsList.length > 0 && (
                       <div className="border-t border-slate-200 pt-4 dark:border-slate-800">
                         <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Related Topics</p>
@@ -115,10 +116,7 @@ export default function BookDetail() {
                   </div>
                 </div>
 
-                {/* RIGHT COLUMN: Scrolling Content */}
                 <div className="lg:w-7/12 pt-2 lg:pt-0">
-                  
-                  {/* Title & Author Header */}
                     <div className="mb-8">
                     <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white leading-[1.1]">
                         {book.title}
@@ -128,10 +126,7 @@ export default function BookDetail() {
                     </p>
                     </div>
 
-                  {/* Content Blocks */}
                     <div className="space-y-10">
-                    
-                    {/* Synopsis Block */}
                     <section>
                         <span className="mb-4 flex w-full border-b border-slate-200 pb-2 font-mono text-xs font-bold uppercase tracking-widest text-slate-400 dark:border-slate-800">
                         [ Synopsis ]
@@ -141,7 +136,6 @@ export default function BookDetail() {
                         </p>
                     </section>
 
-                    {/* Review Block */}
                     <section>
                         <span className="mb-4 flex w-full border-b border-slate-200 pb-2 font-mono text-xs font-bold uppercase tracking-widest text-slate-400 dark:border-slate-800">
                         [ Reflection ]

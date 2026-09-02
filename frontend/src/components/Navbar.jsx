@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Moon, Sun, Menu, X } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const links = [
   { label: 'Home', href: '/' },
@@ -17,6 +17,7 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleNavigation = (e, href) => {
     e.preventDefault();
@@ -38,16 +39,27 @@ export default function Navbar() {
 
         <div className="flex items-center gap-4 md:gap-6">
           <div className="hidden items-center gap-5 md:flex">
-            {links.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => handleNavigation(e, link.href)}
-                className="text-sm font-medium text-slate-600 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-              >
-                {link.label}
-              </a>
-            ))}
+            {links.map((link) => {
+              // Exact match for Home, startsWith for others to keep active state on detail pages
+              const isActive = link.href === '/' 
+                ? location.pathname === '/' 
+                : location.pathname.startsWith(link.href);
+
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={(e) => handleNavigation(e, link.href)}
+                  className={`text-sm font-medium transition-colors ${
+                    isActive 
+                      ? 'text-blue-600 dark:text-blue-400 font-bold' 
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                  }`}
+                >
+                  {link.label}
+                </a>
+              );
+            })}
           </div>
 
           <button
@@ -68,19 +80,30 @@ export default function Navbar() {
         </div>
       </nav>
 
+      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="border-t border-slate-200 bg-white px-4 py-4 md:hidden dark:border-slate-800 dark:bg-[#121212]">
-          <div className="flex flex-col gap-4">
-            {links.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => handleNavigation(e, link.href)}
-                className="text-sm font-medium text-slate-600 dark:text-slate-300"
-              >
-                {link.label}
-              </a>
-            ))}
+          <div className="flex flex-col gap-2">
+            {links.map((link) => {
+              const isActive = link.href === '/' 
+                ? location.pathname === '/' 
+                : location.pathname.startsWith(link.href);
+
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={(e) => handleNavigation(e, link.href)}
+                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold'
+                      : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/50'
+                  }`}
+                >
+                  {link.label}
+                </a>
+              );
+            })}
           </div>
         </div>
       )}

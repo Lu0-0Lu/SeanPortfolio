@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ThemeProvider from '../components/ThemeProvider';
 import Navbar from '../components/Navbar';
@@ -9,6 +9,9 @@ export default function Books() {
   const [books, setBooks] = useState([]);
   const [tagsList, setTagsList] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Animation State
+  const [visibleBooks, setVisibleBooks] = useState(new Set());
 
   useEffect(() => {
     // Fetch both books and the tags dictionary simultaneously
@@ -32,6 +35,28 @@ export default function Books() {
     fetchData();
   }, []);
 
+  // Intersection Observer for Book Grid
+  useEffect(() => {
+    if (loading) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('data-book-id');
+          if (id) {
+            setVisibleBooks(prev => new Set(prev).add(id));
+            observer.unobserve(entry.target);
+          }
+        }
+      });
+    }, { rootMargin: "0px 0px -50px 0px", threshold: 0.1 });
+
+    const nodes = document.querySelectorAll('.book-card');
+    nodes.forEach(node => observer.observe(node));
+
+    return () => observer.disconnect();
+  }, [books, loading]);
+
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-slate-50 text-slate-900 transition-all duration-300 dark:bg-[#121212] dark:text-slate-100 font-sans">
@@ -40,8 +65,8 @@ export default function Books() {
         <MainLayout>
           <main className="mx-auto max-w-6xl space-y-12 pb-20 pt-16 sm:pt-15">
             
-            {/* Page Header */}
-            <div className="border-b border-slate-200 pb-6 dark:border-slate-800">
+            {/* Page Header (Animated) */}
+            <div className="border-b border-slate-200 pb-6 dark:border-slate-800 animate-fade-in-up">
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
                 Literature & Philosophy
               </p>
@@ -58,10 +83,16 @@ export default function Books() {
             ) : (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {books.length > 0 ? (
-                  books.map((book) => (
+                  books.map((book, index) => {
+                    const isVisible = visibleBooks.has(String(book.id));
+                    return (
                     <article 
                       key={book.id} 
-                      className="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft transition-all duration-300 hover:-translate-y-2 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
+                      data-book-id={book.id}
+                      className={`book-card group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft transition-all duration-500 hover:-translate-y-2 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c] ease-out ${
+                        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                      }`}
+                      style={{ transitionDelay: `${(index % 3) * 75}ms` }}
                     >
                       {/* Physical Book Cover Area */}
                       <div className="relative flex h-72 w-full items-center justify-center overflow-hidden bg-slate-100 p-6 dark:bg-[#121212] border-b border-slate-200 dark:border-slate-800">
@@ -140,7 +171,7 @@ export default function Books() {
 
                       </div>
                     </article>
-                  ))
+                  )})
                 ) : (
                   <p className="text-slate-500 font-mono col-span-full">No books in library yet.</p>
                 )}

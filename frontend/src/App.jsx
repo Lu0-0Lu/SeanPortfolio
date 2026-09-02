@@ -22,6 +22,7 @@ import About from './pages/About';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import ArticleDetail from './pages/ArticleDetail';
+import NotFound from './pages/NotFound';
 
 
 export default function App() {
@@ -125,6 +126,9 @@ export default function App() {
         <Route 
         path="/books/:id" 
         element={<BookDetail />} />
+        
+        {/* Fallback for undefined routes */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
