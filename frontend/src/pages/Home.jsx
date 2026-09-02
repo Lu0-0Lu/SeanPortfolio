@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThemeProvider from '../components/ThemeProvider';
 import Navbar from '../components/Navbar';
@@ -10,11 +10,17 @@ export default function Home() {
   const navigate = useNavigate();
   const [featuredProject, setFeaturedProject] = useState(null);
 
+  // Animation Refs & State for Multiple Sections
+  const aboutRef = useRef(null);
+  const cardsRef = useRef(null);
+  const [isAboutVisible, setIsAboutVisible] = useState(false);
+  const [isCardsVisible, setIsCardsVisible] = useState(false);
+
   // 3 Loops / Variations
   const phrases = [
-    "I'm Sean",
-    "I'm a Developer",
-    "I'm an IT Professional"
+    "I'm Sean Brandon.",
+    "I'm a Developer.",
+    "I'm an IT Professional."
   ];
 
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
@@ -22,6 +28,7 @@ export default function Home() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [typingSpeed, setTypingSpeed] = useState(150);
 
+  // Fetch Featured Project
   useEffect(() => {
     fetch('http://localhost:5000/api/projects')
       .then((res) => res.json())
@@ -32,25 +39,49 @@ export default function Home() {
       .catch((err) => console.error(err));
   }, []);
 
+  // Multi-Target Intersection Observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (entry.target === aboutRef.current) setIsAboutVisible(true);
+            if (entry.target === cardsRef.current) setIsCardsVisible(true);
+            
+            // Unobserve after revealing to prevent re-animating
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { 
+        root: null,
+        rootMargin: "0px 0px -100px 0px", // Triggers slightly before full view
+        threshold: 0.1 
+      }
+    );
+
+    if (aboutRef.current) observer.observe(aboutRef.current);
+    if (cardsRef.current) observer.observe(cardsRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
   // Looping typing effect logic
   useEffect(() => {
     const fullText = phrases[currentPhraseIndex];
 
     const handleTyping = () => {
       if (!isDeleting) {
-        // Typing forward
         const nextLength = displayedText.length + 1;
         setDisplayedText(fullText.substring(0, nextLength));
 
         if (displayedText === fullText) {
-          // Pause long when phrase is fully complete
           setTimeout(() => setIsDeleting(true), 2500);
           setTypingSpeed(150);
           return;
         }
         setTypingSpeed(150);
       } else {
-        // Deleting backward
         const nextLength = displayedText.length - 1;
         setDisplayedText(fullText.substring(0, nextLength));
 
@@ -60,7 +91,7 @@ export default function Home() {
           setTypingSpeed(150);
           return;
         }
-        setTypingSpeed(80); // Speed up deletion
+        setTypingSpeed(80);
       }
     };
 
@@ -74,46 +105,49 @@ export default function Home() {
         <Navbar />
 
         <MainLayout>
-          <main className="space-y-24 pb-20 pt-16 sm:pt-16">
+          <main className="space-y-24 pb-20 pt-12 sm:pt-16">
             
-              {/* --- 1. HERO SECTION --- */}
-                {/* Added 'isolate' to keep the -z-10 glow from hiding behind the main background */}
-                <section className="relative isolate grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-                  
-                 {/* --- FAST CSS BACKGROUND ANIMATION --- */}
-                <div className="absolute inset-0 -z-10 flex justify-center overflow-visible pointer-events-none">
-                  <div className="absolute -top-[20%] h-[500px] w-[800px] rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/20 via-blue-900/5 to-transparent blur-3xl dark:from-blue-600/20 dark:via-blue-900/5"></div>
+            {/* --- 1. HERO SECTION --- */}
+            <section className="relative isolate grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+              
+              <div className="absolute inset-0 -z-10 flex justify-center overflow-visible pointer-events-none">
+                <div className="absolute -top-[20%] h-[500px] w-[800px] rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/20 via-blue-900/5 to-transparent blur-3xl dark:from-blue-600/20 dark:via-blue-900/5"></div>
+              </div>
+
+              <div className="relative flex flex-col items-start space-y-6 pt-4">
+                
+                <div className="space-y-2 min-h-[140px] sm:min-h-[120px]">
+                  <p className="font-mono text-xs font-medium uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+                    Project Management / Developer / Technologist
+                  </p>
+
+                  <h1 className="min-h-[90px] sm:min-h-[0px] text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-[3.5rem] dark:text-white leading-[1.15]">
+                    Hello —{" "}
+                    <span className="text-blue-600 dark:text-blue-400">{displayedText}</span><span className="terminal-cursor text-slate-900 dark:text-white"></span>
+                  </h1>
                 </div>
 
-                  {/* --- ORIGINAL CONTENT --- */}
-                  <div className="space-y-6">
-                    <p className="text-sm font-medium uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                      Project Management / Developer / Technologist
-                    </p>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl leading-[1.15] dark:text-white">
-                      Building technologies and delivering IT solutions that streamline operations.
-                    </h1>
-                    <p className="max-w-xl text-base leading-7 text-slate-600 sm:text-lg dark:text-slate-300">
-                      I’m Sean Brandon Reyes, a technology-focused professional interested in web applications, 
-                      backend development, SQL databases, IT and systems support, embedded technologies, and meaningful digital transformation.
-                    </p>
-                    <div className="flex flex-wrap gap-4 pt-2">
-                      <button 
-                        onClick={() => navigate('/projects')}
-                        className="rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-[#121212]"
-                      >
-                        View Projects
-                      </button>
-                      <button 
-                        onClick={() => navigate('/contact')}
-                        className="rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-100"
-                      >
-                        Contact Me
-                      </button>
-                    </div>
-                  </div>
+                <p className="max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg dark:text-slate-300">
+                  A technology-focused professional interested in web applications, backend development, SQL databases, IT and systems support, embedded technologies, and meaningful digital transformation.
+                </p>
 
-              {/* Featured Work Card */}
+                <div className="flex flex-wrap gap-4 pt-2">
+                  <button 
+                    onClick={() => navigate('/projects')}
+                    className="rounded-full bg-slate-900 px-7 py-3 text-sm font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-[#121212]"
+                  >
+                    View Projects
+                  </button>
+                  <button 
+                    onClick={() => navigate('/contact')}
+                    className="rounded-full border border-slate-300 px-7 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-100"
+                  >
+                    Contact Me
+                  </button>
+                </div>
+              </div>
+
+              {/* RIGHT COLUMN: Featured Work Card */}
               <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]">
                 <div className="flex items-center justify-between border-b border-slate-200 bg-slate-100 px-5 py-3 dark:border-slate-800 dark:bg-[#121212]">
                   <div className="flex items-center space-x-2">
@@ -134,7 +168,6 @@ export default function Home() {
                         {featuredProject.description}
                       </p>
 
-                      {/* Video Link Prioritization */}
                       {featuredProject.video_url || featuredProject.videoUrl || featuredProject.video ? (
                         <div className="overflow-hidden rounded-2xl border border-slate-200 aspect-video w-full shadow-sm dark:border-slate-700 mt-6 bg-black flex items-center justify-center">
                           <iframe 
@@ -160,62 +193,55 @@ export default function Home() {
                   )}
                 </div>
               </div>
+
             </section>
 
-            {/* --- 2. TERMINAL AESTHETIC / HI I'M SEAN SECTION --- */}
-            <section className="border-t border-slate-200 pt-12 sm:pt-16 dark:border-slate-800">
-              <div className="grid items-center gap-10 lg:grid-cols-[1fr_0.8fr]">
+            {/* --- 2. ABOUT PROFILE SECTION --- */}
+            <section ref={aboutRef} className="border-t border-slate-200 pt-16 dark:border-slate-800">
+              <div 
+                className={`grid items-center gap-12 lg:grid-cols-[1fr_0.8fr] transition-all duration-1000 ease-out ${
+                  isAboutVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+                }`}
+              >
                 
-                <div className="space-y-6 sm:space-y-8">
-                  {/* 
-                    NATURAL DYNAMIC HEADER: 
-                    No invisible hacks, no min-heights. The browser naturally handles the spacing.
-                    Added a subtle blue tint to the typed text to make it pop!
-                  */}
-                  <h2 className="font-mono text-4xl font-bold tracking-tight sm:text-5xl dark:text-white">
-                    Hi — <span className="text-blue-600 dark:text-blue-400">{displayedText}</span><span className="terminal-cursor text-slate-900 dark:text-white"></span>
+                <div className="space-y-6">
+                  <h2 className="font-mono text-3xl font-bold tracking-tight sm:text-4xl dark:text-white">
+                    Engineering reliable software & physical systems
                   </h2>
-                  
-                  <p className="font-mono text-base leading-relaxed text-slate-700 sm:text-lg dark:text-slate-300">
+                  <p className="text-base leading-relaxed text-slate-600 sm:text-lg dark:text-slate-300">
                     I thrive in dynamic environments where adaptability is key, seamlessly transitioning between developing accessible web applications and architecting backend software. Combining this versatile skill set with a strong foundation in project management and IT and system support, I guide technical builds from initial planning through to deployment and ongoing maintenance. Beyond full-stack development, my expertise extends to embedded systems, utilizing microcontrollers like Arduino and Raspberry Pi to bridge the gap between digital servers and physical hardware. I specialize in engineering practical, automated technologies that deliver tangible, real-world impact.
                   </p>
-                  
-                  <div className="flex flex-wrap gap-4 pt-2">
+                  <div className="pt-2">
                     <button 
-                      onClick={() => navigate('/about')}
-                      className="rounded-none border-2 border-slate-900 bg-slate-900 px-6 py-3 font-mono text-sm font-bold text-white transition hover:bg-transparent hover:text-slate-900 dark:border-white dark:bg-white dark:text-[#121212] dark:hover:bg-transparent dark:hover:text-white"
-                    >
-                      Read Full Background
-                    </button>
+  onClick={() => navigate('/about')}
+  className="rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-900 border border-slate-200 shadow-sm transition-all duration-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 dark:bg-slate-100 dark:text-[#121212] dark:border-transparent dark:hover:bg-[#1a1a1c] dark:hover:text-white dark:hover:border-slate-700"
+>
+  More About Me
+</button>
                   </div>
                 </div>
 
                 {/* Profile Image Area */}
-                <div className="relative mx-auto w-full max-w-md flex justify-center py-6 group -mt-10 lg:-mt-28">
-                  
-                  {/* Subtle ambient backlight */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-80 w-80 rounded-full bg-blue-600/10 blur-3xl transition-all duration-500 pointer-events-none group-hover:bg-blue-500/25"></div>
-
-                  {/* Silhouette drop-shadow */}
-                  <div className="animate-float profile-pop relative w-full max-w-[380px] lg:max-w-[420px] cursor-pointer drop-shadow-xl">
-                    {/* Pushed the fade start to 88% so only the bottom edge gracefully melts away */}
+                <div className="relative mx-auto w-full max-w-md flex justify-center py-6 group">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-72 w-72 rounded-full bg-blue-600/10 blur-3xl transition-all duration-500 pointer-events-none group-hover:bg-blue-500/25"></div>
+                  <div className="animate-float profile-pop relative w-full max-w-[340px] lg:max-w-[380px] cursor-pointer drop-shadow-xl">
                     <img 
                       src={profileImage} 
                       alt="Sean Brandon F. Reyes" 
                       className="h-auto w-full object-contain transition-transform duration-700 hover:scale-105 [-webkit-mask-image:linear-gradient(to_bottom,black_88%,transparent_100%)] [mask-image:linear-gradient(to_bottom,black_88%,transparent_100%)]"
                     />
                   </div>
-                  
                 </div>
 
               </div>
             </section>
 
             {/* --- 3. GATEWAY / SHORTCUT CARDS --- */}
-              <section className="border-t border-slate-200 pt-16 dark:border-slate-800">
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                  
-                  {/* Projects Card */}
+            <section ref={cardsRef} className="border-t border-slate-200 pt-16 dark:border-slate-800">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                
+                {/* Projects Card (0ms delay) */}
+                <div className={`transition-all duration-700 ease-out ${isCardsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`} style={{ transitionDelay: '0ms' }}>
                   <div 
                     onClick={() => navigate('/projects')}
                     className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
@@ -230,8 +256,10 @@ export default function Home() {
                       View my hardware and software builds.
                     </p>
                   </div>
+                </div>
 
-                  {/* Articles Card */}
+                {/* Articles Card (100ms delay) */}
+                <div className={`transition-all duration-700 ease-out ${isCardsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`} style={{ transitionDelay: '100ms' }}>
                   <div 
                     onClick={() => navigate('/articles')}
                     className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
@@ -246,8 +274,10 @@ export default function Home() {
                       Technical insights and tutorials.
                     </p>
                   </div>
+                </div>
 
-                  {/* Library Card */}
+                {/* Library Card (200ms delay) */}
+                <div className={`transition-all duration-700 ease-out ${isCardsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`} style={{ transitionDelay: '200ms' }}>
                   <div 
                     onClick={() => navigate('/books')}
                     className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
@@ -262,8 +292,10 @@ export default function Home() {
                       Reviews of literature and philosophy.
                     </p>
                   </div>
+                </div>
 
-                  {/* Poetry Card */}
+                {/* Poetry Card (300ms delay) */}
+                <div className={`transition-all duration-700 ease-out ${isCardsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`} style={{ transitionDelay: '300ms' }}>
                   <div 
                     onClick={() => navigate('/poetry')}
                     className="uiverse-card group relative flex h-[250px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
@@ -278,9 +310,10 @@ export default function Home() {
                       Creative writing and reflections.
                     </p>
                   </div>
-
                 </div>
-              </section>
+
+              </div>
+            </section>
 
           </main>
         </MainLayout>

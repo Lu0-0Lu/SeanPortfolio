@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ThemeProvider from '../components/ThemeProvider';
 import Navbar from '../components/Navbar';
 import MainLayout from '../components/MainLayout';
 import Footer from '../components/Footer';
 
-import { GraduationCap, Award, BadgeCheck, Briefcase, Star, Trophy, Cpu } from 'lucide-react';
+import { GraduationCap, Award, BadgeCheck, Briefcase, Star, Trophy, Cpu, ChevronDown } from 'lucide-react';
 
 export default function About() {
   const [experiences, setExperiences] = useState([]);
@@ -12,6 +12,13 @@ export default function About() {
   
   // State for the collapsible About section
   const [isAboutExpanded, setIsAboutExpanded] = useState(false);
+
+  // Animation State for Individual Timeline Items & Sections
+  const [visibleItems, setVisibleItems] = useState(new Set());
+  const eduCertRef = useRef(null);
+  const skillsRef = useRef(null);
+  const [isEduCertVisible, setIsEduCertVisible] = useState(false);
+  const [isSkillsVisible, setIsSkillsVisible] = useState(false);
 
   useEffect(() => {
     // Fetch Experiences
@@ -27,16 +34,46 @@ export default function About() {
       .catch((err) => console.error(err));
   }, []);
 
+  // Intersection Observer for Individual Items & Sections
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Trigger individual timeline cards
+          if (entry.target.hasAttribute('data-exp-id')) {
+            const id = entry.target.getAttribute('data-exp-id');
+            setVisibleItems(prev => new Set(prev).add(id));
+          }
+          // Trigger broader sections
+          if (entry.target === eduCertRef.current) setIsEduCertVisible(true);
+          if (entry.target === skillsRef.current) setIsSkillsVisible(true);
+          
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: "0px 0px -100px 0px", threshold: 0.1 });
+
+    // Observe individual experience nodes
+    const expNodes = document.querySelectorAll('.exp-node');
+    expNodes.forEach(node => observer.observe(node));
+
+    // Observe sections
+    if (eduCertRef.current) observer.observe(eduCertRef.current);
+    if (skillsRef.current) observer.observe(skillsRef.current);
+
+    return () => observer.disconnect();
+  }, [experiences]); // Re-run when experiences load into the DOM
+
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-slate-50 text-slate-900 transition-all duration-300 dark:bg-[#121212] dark:text-slate-100">
         <Navbar />
 
         <MainLayout>
-          <main className="max-w-4xl mx-auto space-y-20 pb-20 pt-16 sm:pt-24">
+          <main className="max-w-4xl mx-auto space-y-24 pb-20 pt-16 sm:pt-24">
   
             {/* --- 1. INTRODUCTION (Collapsible) --- */}
-            <section>
+            <section className="animate-fade-in-up flex flex-col min-h-[70vh] justify-center relative">
               <h1 className="font-mono text-4xl font-bold tracking-tight sm:text-5xl dark:text-white mb-8">
                 About Me
               </h1>
@@ -50,12 +87,12 @@ export default function About() {
                   I don't just write code; I look at the entire operational ecosystem. From scalable web backends to embedded hardware, my goal is to deliver end-to-end systems that hit strategic objectives and solve practical, real-world problems.
                 </p>
 
-                {/* Toggle Button */}
+                {/* Updated Premium White/Dark Toggle Button */}
                 <button 
                   onClick={() => setIsAboutExpanded(!isAboutExpanded)}
-                  className="group flex items-center gap-2 font-mono text-sm font-bold text-blue-600 transition-colors hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                  className="group flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-900 border border-slate-200 shadow-sm transition-all duration-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 dark:bg-slate-100 dark:text-[#121212] dark:border-transparent dark:hover:bg-[#1a1a1c] dark:hover:text-white dark:hover:border-slate-700"
                 >
-                  <span className="border-b border-transparent transition-colors group-hover:border-current">
+                  <span>
                     {isAboutExpanded ? "Hide Full Background" : "Read Full Background"}
                   </span>
                   <svg 
@@ -113,6 +150,11 @@ export default function About() {
                   </div>
                 </div>
               </div>
+
+              {/* Scroll Indicator (Bouncing Chevron) to explicitly show scrollability */}
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-60 text-slate-400 hidden sm:block">
+                <ChevronDown className="h-8 w-8" />
+              </div>
             </section>
 
             {/* --- 2. WORK EXPERIENCE --- */}
@@ -125,15 +167,23 @@ export default function About() {
               {/* Timeline Container */}
               <div className="relative ml-4 space-y-12 border-l-2 border-slate-200 dark:border-slate-800 sm:ml-6">
                 {experiences.length > 0 ? (
-                  experiences.map((item) => (
-                    <div key={item.id} className="relative pl-8 sm:pl-12">
+                  experiences.map((item) => {
+                    const isVisible = visibleItems.has(String(item.id));
+                    return (
+                    <div 
+                      key={item.id} 
+                      data-exp-id={item.id}
+                      className={`exp-node relative pl-8 sm:pl-12 transition-all duration-[800ms] ease-out ${
+                        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-12'
+                      }`}
+                    >
                       
-                      {/* Timeline Node */}
-                      <div className="absolute -left-[25px] top-0 flex h-12 w-12 items-center justify-center rounded-full rounded-tl-none bg-blue-600 shadow-sm ring-4 ring-slate-50 dark:bg-blue-500 dark:ring-[#121212]">
+                      {/* Timeline Node (Scales in as the card drops down) */}
+                      <div className={`absolute -left-[25px] top-0 flex h-12 w-12 items-center justify-center rounded-full rounded-tl-none bg-blue-600 shadow-sm ring-4 ring-slate-50 dark:bg-blue-500 dark:ring-[#121212] transition-transform duration-[600ms] delay-200 ${isVisible ? 'scale-100' : 'scale-0'}`}>
                         <Briefcase className="h-5 w-5 text-white" />
                       </div>
 
-                      {/* The Card - UNIFIED FLAT DESIGN */}
+                      {/* The Card */}
                       <article 
                         className="group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-slate-400 dark:border-slate-800 dark:bg-[#1a1a1c] dark:hover:border-slate-700"
                       >
@@ -165,7 +215,7 @@ export default function About() {
                       </article>
 
                     </div>
-                  ))
+                  )})
                 ) : (
                   <p className="pl-8 font-mono text-slate-500">Loading experiences...</p>
                 )}
@@ -173,7 +223,7 @@ export default function About() {
             </section>
 
             {/* --- 3. EDUCATION & CERTIFICATIONS --- */}
-            <section className="grid gap-8 lg:grid-cols-2">
+            <section ref={eduCertRef} className={`grid gap-8 lg:grid-cols-2 transition-all duration-1000 ease-out ${isEduCertVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
               
               {/* Education */}
               <div>
@@ -182,7 +232,7 @@ export default function About() {
                   <h2 className="font-mono text-2xl font-bold dark:text-white">Education</h2>
                 </div>
                 
-                {/* Education Card - UNIFIED FLAT DESIGN */}
+                {/* Education Card */}
                 <article className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-slate-400 dark:border-slate-800 dark:bg-[#1a1a1c] dark:hover:border-slate-700">
                   <h3 className="font-mono text-xl font-bold uppercase text-slate-900 dark:text-white">
                     Bachelor of Science in Information Technology
@@ -227,7 +277,7 @@ export default function About() {
                   <h2 className="font-mono text-2xl font-bold dark:text-white">Certifications</h2>
                 </div>
                 
-                {/* Certifications Card - UNIFIED FLAT DESIGN */}
+                {/* Certifications Card */}
                 <article className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-slate-400 dark:border-slate-800 dark:bg-[#1a1a1c] dark:hover:border-slate-700">
                   <ul className="space-y-6 relative z-10">
                     {certifications.length > 0 ? (
@@ -269,7 +319,7 @@ export default function About() {
             </section>
 
             {/* --- 4. SKILLS --- */}
-            <section className="space-y-8 pt-10">
+            <section ref={skillsRef} className={`space-y-8 pt-10 transition-all duration-1000 ease-out ${isSkillsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
               <div className="mb-12 flex items-center gap-3 border-b border-slate-200 pb-4 dark:border-slate-800">
                 <Cpu className="h-6 w-6 text-blue-600 dark:text-blue-500" />
                 <h2 className="font-mono text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
@@ -277,11 +327,10 @@ export default function About() {
                 </h2>
               </div>
 
-              {/* Changed to a 2-column grid to perfectly fit 4 distinct categories */}
               <div className="grid gap-6 sm:grid-cols-2">
                 
                 {/* Software & Web */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft transition-all hover:border-slate-400 dark:border-slate-800 dark:bg-[#1a1a1c]">
+                <div className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-soft transition-all duration-700 hover:border-slate-400 dark:border-slate-800 dark:bg-[#1a1a1c] ${isSkillsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: '0ms' }}>
                   <h3 className="mb-4 font-mono text-xs font-bold uppercase tracking-widest text-slate-400">Software & Web</h3>
                   <div className="flex flex-wrap gap-2">
                     {['JavaScript', 'React', 'PHP', 'Laravel', 'CodeIgniter 4', 'Node.js', 'VB.Net', 'ASP.Net'].map(skill => (
@@ -293,7 +342,7 @@ export default function About() {
                 </div>
 
                 {/* Backend & Data */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft transition-all hover:border-slate-400 dark:border-slate-800 dark:bg-[#1a1a1c]">
+                <div className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-soft transition-all duration-700 hover:border-slate-400 dark:border-slate-800 dark:bg-[#1a1a1c] ${isSkillsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: '100ms' }}>
                   <h3 className="mb-4 font-mono text-xs font-bold uppercase tracking-widest text-slate-400">Backend & Data</h3>
                   <div className="flex flex-wrap gap-2">
                     {['Python', 'Java', 'C#', 'C++', 'SQL', 'MySQL', 'MariaDB', 'SQLite', 'Oracle SQL', 'PostgreSQL'].map(skill => (
@@ -305,7 +354,7 @@ export default function About() {
                 </div>
 
                 {/* Embedded Systems */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft transition-all hover:border-slate-400 dark:border-slate-800 dark:bg-[#1a1a1c]">
+                <div className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-soft transition-all duration-700 hover:border-slate-400 dark:border-slate-800 dark:bg-[#1a1a1c] ${isSkillsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: '200ms' }}>
                   <h3 className="mb-4 font-mono text-xs font-bold uppercase tracking-widest text-slate-400">Embedded Systems</h3>
                   <div className="flex flex-wrap gap-2">
                     {[
@@ -325,7 +374,7 @@ export default function About() {
                 </div>
 
                 {/* IT Operations & Support */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft transition-all hover:border-slate-400 dark:border-slate-800 dark:bg-[#1a1a1c]">
+                <div className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-soft transition-all duration-700 hover:border-slate-400 dark:border-slate-800 dark:bg-[#1a1a1c] ${isSkillsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: '300ms' }}>
                   <h3 className="mb-4 font-mono text-xs font-bold uppercase tracking-widest text-slate-400">IT Operations & Support</h3>
                   <div className="flex flex-wrap gap-2">
                     {['Operating Systems', 'Networking Basics', 'Hardware Support', 'Ticketing Systems', 'Remote Tools', 'Microsoft 365', 'Jira', 'Git / GitHub'].map(skill => (

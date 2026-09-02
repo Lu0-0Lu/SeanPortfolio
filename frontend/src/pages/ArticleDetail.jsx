@@ -10,6 +10,9 @@ export default function ArticleDetail() {
   const navigate = useNavigate();
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // State for the guaranteed slide-up animation
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/articles/${id}`)
@@ -20,6 +23,8 @@ export default function ArticleDetail() {
       .then((data) => {
         setArticle(data);
         setLoading(false);
+        // Trigger the animation shortly after the data renders into the DOM
+        setTimeout(() => setIsLoaded(true), 50);
       })
       .catch((err) => {
         console.error(err);
@@ -42,13 +47,16 @@ export default function ArticleDetail() {
             </button>
 
             {loading ? (
-              <div className="text-slate-500 font-mono">Loading article...</div>
+              <div className="text-slate-500 font-mono animate-pulse">Loading article...</div>
             ) : !article ? (
               <div className="text-red-500 font-bold text-xl">Article not found.</div>
             ) : (
-              <article className="mx-auto max-w-3xl">
+              <article 
+                className={`mx-auto max-w-3xl transition-all duration-[800ms] ease-out ${
+                  isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                }`}
+              >
                 
-                {/* Article Header */}
                 <header className="mb-12 border-b border-slate-200 pb-10 dark:border-slate-800">
                   {article.is_featured && (
                     <div className="mb-6 inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-700 dark:border-amber-900/50 dark:bg-[#1a1a1c] dark:text-amber-400">
@@ -65,14 +73,12 @@ export default function ArticleDetail() {
                   </div>
                 </header>
 
-                {/* Article Content */}
                 <div className="prose prose-slate prose-lg max-w-none text-slate-700 dark:prose-invert dark:text-slate-300">
                   {article.content.split('\n').map((paragraph, idx) => (
                     paragraph.trim() && <p key={idx} className="mb-6 leading-relaxed break-words">{paragraph}</p>
                   ))}
                 </div>
 
-                {/* Sources Section */}
                 {article.sources && (
                   <div className="mt-16 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-[#1a1a1c]">
                     <h5 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white">

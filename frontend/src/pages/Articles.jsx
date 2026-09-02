@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ThemeProvider from '../components/ThemeProvider';
 import Navbar from '../components/Navbar';
@@ -9,6 +9,11 @@ export default function Articles() {
   const [articles, setArticles] = useState([]);
   const [featuredArticle, setFeaturedArticle] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Animation States
+  const [visibleArticles, setVisibleArticles] = useState(new Set());
+  const featuredRef = useRef(null);
+  const [isFeaturedVisible, setIsFeaturedVisible] = useState(false);
 
   useEffect(() => {
     fetch('http://localhost:5000/api/articles')
@@ -24,6 +29,32 @@ export default function Articles() {
         setLoading(false);
       });
   }, []);
+
+  // Intersection Observer for Animations
+  useEffect(() => {
+    if (loading) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (entry.target === featuredRef.current) setIsFeaturedVisible(true);
+          
+          if (entry.target.hasAttribute('data-article-id')) {
+            const id = entry.target.getAttribute('data-article-id');
+            setVisibleArticles(prev => new Set(prev).add(id));
+          }
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: "0px 0px -50px 0px", threshold: 0.1 });
+
+    if (featuredRef.current) observer.observe(featuredRef.current);
+    
+    const nodes = document.querySelectorAll('.article-card');
+    nodes.forEach(node => observer.observe(node));
+
+    return () => observer.disconnect();
+  }, [articles, loading]);
 
   // 1. Filter out the featured article
   const regularArticles = articles.filter(a => a.id !== featuredArticle?.id);
@@ -49,8 +80,8 @@ export default function Articles() {
         <MainLayout>
           <main className="mx-auto max-w-6xl space-y-16 pb-20 pt-16 sm:pt-15">
             
-            {/* Page Header */}
-            <div className="border-b border-slate-200 pb-6 dark:border-slate-800">
+            {/* Page Header (Animated) */}
+            <div className="border-b border-slate-200 pb-6 dark:border-slate-800 animate-fade-in-up">
               <p className="text-sm font-bold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
                 Insights & Tutorials
               </p>
@@ -63,12 +94,13 @@ export default function Articles() {
             </div>
 
             {loading ? (
-              <p className="font-mono text-slate-500">Loading articles...</p>
+              <p className="font-mono text-slate-500 animate-pulse">Loading articles...</p>
             ) : (
               <div className="space-y-16">
+                
                 {/* --- HERO SECTION: Featured Article --- */}
                 {featuredArticle && (
-                  <section className="space-y-6">
+                  <section ref={featuredRef} className={`space-y-6 transition-all duration-1000 ease-out ${isFeaturedVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                     <div className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-700 dark:border-amber-900/50 dark:bg-[#1a1a1c] dark:text-amber-400">
                       ⭐ Featured Read
                     </div>
@@ -78,8 +110,6 @@ export default function Articles() {
                         <div className="mb-4 inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                           {featuredArticle.category || 'General'}
                         </div>
-                        {/* CRASH FIX: Removed the invalid featuredProject variable */}
-                        {/* SIZE FIX: Scaled down to match Projects layout */}
                         <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl break-words leading-tight">
                           {featuredArticle.title}
                         </h2>
@@ -88,7 +118,6 @@ export default function Articles() {
                         </p>
                       </header>
                       
-                      {/* SIZE FIX: Normalized text sizes from text-lg to text-sm sm:text-base */}
                       <div className="text-slate-700 dark:text-slate-300 leading-relaxed text-sm sm:text-base line-clamp-4">
                         {featuredArticle.content.split('\n').map((paragraph, idx) => (
                           paragraph.trim() && <p key={idx} className="mb-4 last:mb-0 break-words">{paragraph}</p>
@@ -123,10 +152,16 @@ export default function Articles() {
                         
                         {/* Category Articles Grid */}
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                          {groupedArticles[category].map((article) => (
+                          {groupedArticles[category].map((article, index) => {
+                            const isVisible = visibleArticles.has(String(article.id));
+                            return (
                             <article 
                               key={article.id} 
-                              className="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c]"
+                              data-article-id={article.id}
+                              className={`article-card flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-soft transition-all duration-[700ms] hover:-translate-y-1 hover:border-slate-400 hover:shadow-xl dark:border-slate-800 dark:bg-[#1a1a1c] ease-out ${
+                                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                              }`}
+                              style={{ transitionDelay: `${index * 100}ms` }}
                             >
                               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 {article.date}
@@ -149,7 +184,7 @@ export default function Articles() {
                                 </Link>
                               </div>
                             </article>
-                          ))}
+                          )})}
                         </div>
 
                       </section>
