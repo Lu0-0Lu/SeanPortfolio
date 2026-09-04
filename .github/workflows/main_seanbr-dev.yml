@@ -30,12 +30,6 @@ jobs:
           npm run build --if-present
           npm run test --if-present
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-app
-          path: ./backend
-          
       - name: Install and Build Frontend
         working-directory: ./frontend
         run: |
@@ -50,6 +44,12 @@ jobs:
           cp -r frontend/dist/. backend/dist/
           echo "Checking backend dist contents..."
           ls -la backend/dist
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-app
+          path: ./backend
 
   deploy:
     runs-on: ubuntu-latest
