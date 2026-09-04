@@ -1,13 +1,50 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const db = require('./db');
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// Trust Azure's proxy so rate limiting identifies users correctly
+app.set('trust proxy', 1);
+
+// 1. Security Headers (Top priority)
+app.use(helmet());
+
+// 2. Body Parser
 app.use(express.json());
+
+// 3. Secure CORS (Only one instance)
+const corsOptions = {
+  // Replace with your actual Azure frontend URL once deployed
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://your-portfolio-name.azurewebsites.net' 
+    : 'http://localhost:5173', 
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+
+// 4. Rate Limiters
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per IP
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api', apiLimiter);
+
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 Hour
+  max: 5, // 5 login requests per IP
+  message: 'Too many login attempts, please try again after an hour'
+});
+app.use('/api/auth/login', authLimiter);
+
+// --- ROUTES ---
 
 // Test Route
 app.get('/api/status', async (req, res) => {
@@ -30,7 +67,6 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/experiences', require('./routes/experiences'));
 app.use('/api/certifications', require('./routes/certifications'));
-
 
 // The New Written Content Routes
 app.use('/api/articles', require('./routes/articles'));
