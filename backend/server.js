@@ -31,6 +31,11 @@ app.use(cors(corsOptions));
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // 100 requests per IP
+  keyGenerator: (req) => {
+    // Strip port if present in req.ip
+    const ip = req.ip || req.headers['x-forwarded-for'] || '';
+    return ip.includes(':') && ip.includes('.') ? ip.split(':')[0] : ip.replace(/:\d+$/, '');
+  },
   message: 'Too many requests from this IP, please try again after 15 minutes',
   standardHeaders: true,
   legacyHeaders: false,
@@ -40,6 +45,10 @@ app.use('/api', apiLimiter);
 const authLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 Hour
   max: 5, // 5 login requests per IP
+  keyGenerator: (req) => {
+    const ip = req.ip || req.headers['x-forwarded-for'] || '';
+    return ip.includes(':') && ip.includes('.') ? ip.split(':')[0] : ip.replace(/:\d+$/, '');
+  },
   message: 'Too many login attempts, please try again after an hour'
 });
 app.use('/api/auth/login', authLimiter);
