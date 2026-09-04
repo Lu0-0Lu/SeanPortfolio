@@ -18,9 +18,8 @@ app.use(express.json());
 
 // 3. Secure CORS (Only one instance)
 const corsOptions = {
-  // Replace with your actual Azure frontend URL once deployed
   origin: process.env.NODE_ENV === 'production' 
-    ? 'https://your-portfolio-name.azurewebsites.net' 
+    ? process.env.FRONTEND_URL 
     : 'http://localhost:5173', 
   credentials: true,
   optionsSuccessStatus: 200
