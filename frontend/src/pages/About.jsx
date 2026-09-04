@@ -87,10 +87,10 @@ export default function About() {
                   I don't just write code; I look at the entire operational ecosystem. From scalable web backends to embedded hardware, my goal is to deliver end-to-end systems that hit strategic objectives and solve practical, real-world problems.
                 </p>
 
-                {/* Updated Premium White/Dark Toggle Button */}
+                {/* Corrected Dynamic Primary Button */}
                 <button 
                   onClick={() => setIsAboutExpanded(!isAboutExpanded)}
-                  className="group flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-900 border border-slate-200 shadow-sm transition-all duration-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 dark:bg-slate-100 dark:text-[#121212] dark:border-transparent dark:hover:bg-[#1a1a1c] dark:hover:text-white dark:hover:border-slate-700"
+                  className="group inline-flex w-fit items-center gap-2 rounded-full bg-slate-900 px-7 py-3 text-sm font-bold text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-slate-800 dark:bg-white dark:text-[#121212] dark:hover:bg-slate-200"
                 >
                   <span>
                     {isAboutExpanded ? "Hide Full Background" : "Read Full Background"}
@@ -151,10 +151,14 @@ export default function About() {
                 </div>
               </div>
 
-              {/* Scroll Indicator (Bouncing Chevron) to explicitly show scrollability */}
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-60 text-slate-400 hidden sm:block">
-                <ChevronDown className="h-8 w-8" />
-              </div>
+              {/* Scroll Indicator (Bouncing Chevron) - Fades out when expanded */}
+                <div 
+                  className={`absolute bottom-4 left-1/2 -translate-x-1/2 animate-bounce text-slate-400 hidden sm:block transition-all duration-500 ${
+                    isAboutExpanded ? 'opacity-0 pointer-events-none' : 'opacity-60'
+                  }`}
+                >
+                  <ChevronDown className="h-8 w-8" />
+                </div>
             </section>
 
             {/* --- 2. WORK EXPERIENCE --- */}
@@ -238,7 +242,7 @@ export default function About() {
                     Bachelor of Science in Information Technology
                   </h3>
                   <div className="mt-1 text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-blue-400/80">
-                    Quezon City University
+                    Quezo City University
                   </div>
                   <p className="mt-2 font-mono text-sm font-bold text-slate-700 dark:text-slate-300">
                     Graduated June 2026
