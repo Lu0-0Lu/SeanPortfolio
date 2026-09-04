@@ -77,11 +77,11 @@ app.use('/api/book-tags', require('./routes/bookTags'));
 app.use('/api/contact', require('./routes/contact'));
 
 
-// --- SERVE STATIC FRONTEND LAST (Catch-all for React Router) ---
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
+// --- SERVE STATIC FRONTEND ---
+app.use(express.static(path.join(__dirname, 'dist')));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  res.sendFile(path.join(__dirname, 'dist/index.html'));
 });
 
 
