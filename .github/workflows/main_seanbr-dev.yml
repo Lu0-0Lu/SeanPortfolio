@@ -44,8 +44,12 @@ jobs:
 
       - name: Copy Frontend Build to Backend Public Directory
         run: |
+          echo "Checking frontend build output..."
+          ls -la frontend/dist
           mkdir -p backend/dist
-          cp -r frontend/dist/* backend/dist/
+          cp -r frontend/dist/. backend/dist/
+          echo "Checking backend dist contents..."
+          ls -la backend/dist
 
   deploy:
     runs-on: ubuntu-latest
