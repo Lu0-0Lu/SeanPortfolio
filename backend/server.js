@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path'); // Move require to the top with others
 require('dotenv').config();
 const db = require('./db');
 
@@ -43,7 +44,7 @@ const authLimiter = rateLimit({
 });
 app.use('/api/auth/login', authLimiter);
 
-// --- ROUTES ---
+// --- API ROUTES FIRST ---
 
 // Test Route
 app.get('/api/status', async (req, res) => {
@@ -54,11 +55,6 @@ app.get('/api/status', async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Database connection failed' });
   }
-});
-
-// Root Route
-app.get('/', (req, res) => {
-  res.send('Sean\'s Portfolio Backend API is running!');
 });
 
 // API Routes
@@ -79,6 +75,15 @@ app.use('/api/book-tags', require('./routes/bookTags'));
 
 // --- CONTACT ROUTE ---
 app.use('/api/contact', require('./routes/contact'));
+
+
+// --- SERVE STATIC FRONTEND LAST (Catch-all for React Router) ---
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
 
 // Start Server
 const PORT = process.env.PORT || 5000;
