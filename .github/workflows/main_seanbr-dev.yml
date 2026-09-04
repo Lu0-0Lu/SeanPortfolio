@@ -35,6 +35,17 @@ jobs:
         with:
           name: node-app
           path: ./backend
+          
+      - name: Install and Build Frontend
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm run build
+
+      - name: Copy Frontend Build to Backend Public Directory
+        run: |
+          mkdir -p backend/dist
+          cp -r frontend/dist/* backend/dist/
 
   deploy:
     runs-on: ubuntu-latest
