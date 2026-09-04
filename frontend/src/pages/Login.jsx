@@ -9,8 +9,11 @@ export default function Login() {
     e.preventDefault();
     setError('');
     
+    // Dynamically choose API base URL based on environment
+    const API_BASE_URL = import.meta.env.MODE === 'production' ? '' : 'http://localhost:5000';
+
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -19,9 +22,7 @@ export default function Login() {
       const data = await res.json();
       
       if (res.ok) {
-        // Save the VIP pass (JWT) to the browser's local storage
         localStorage.setItem('adminToken', data.token);
-        // Redirect to the future admin dashboard
         window.location.href = '/admin'; 
       } else {
         setError(data.error || 'Login failed');
