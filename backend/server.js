@@ -12,7 +12,20 @@ const app = express();
 app.set('trust proxy', 1);
 
 // 1. Security Headers (Top priority)
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"], // Allows external image URLs
+        frameSrc: ["'self'", "https://www.youtube.com"], // Allows YouTube embeds
+        connectSrc: ["'self'"],
+      },
+    },
+  })
+);
 
 // 2. Body Parser
 app.use(express.json());
