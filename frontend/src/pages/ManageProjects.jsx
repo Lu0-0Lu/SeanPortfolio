@@ -21,7 +21,7 @@ export default function ManageProjects() {
   };
 
   const fetchProjects = async () => {
-    const res = await fetch('http://localhost:5000/api/projects');
+    const res = await fetch('/api/projects');
     const data = await res.json();
     setProjects(data);
   };
@@ -73,8 +73,8 @@ export default function ManageProjects() {
 
     try {
       const url = editingId 
-        ? `http://localhost:5000/api/projects/${editingId}` 
-        : 'http://localhost:5000/api/projects';
+        ? `/api/projects/${editingId}` 
+        : '/api/projects';
       const method = editingId ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -126,7 +126,7 @@ export default function ManageProjects() {
 
     const token = localStorage.getItem('adminToken');
     for (let i = 0; i < newProjects.length; i++) {
-      await fetch(`http://localhost:5000/api/projects/${newProjects[i].id}`, {
+      await fetch(`/api/projects/${newProjects[i].id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ export default function ManageProjects() {
 
   const handleToggleFeature = async (id) => {
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/projects/${id}`, {
+    await fetch(`/api/projects/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ export default function ManageProjects() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this project?')) return;
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/projects/${id}`, {
+    await fetch(`/api/projects/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

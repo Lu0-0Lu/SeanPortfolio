@@ -11,7 +11,7 @@ export default function Poetry() {
   const [isListVisible, setIsListVisible] = useState(false);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/poetry')
+    fetch('/api/poetry')
       .then((res) => res.json())
       .then((data) => {
         setPoetry(data);

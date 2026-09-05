@@ -21,7 +21,7 @@ export default function ManageExperiences() {
   };
 
   const fetchExperiences = async () => {
-    const res = await fetch('http://localhost:5000/api/experiences');
+    const res = await fetch('/api/experiences');
     const data = await res.json();
     setExperiences(data);
   };
@@ -60,8 +60,8 @@ export default function ManageExperiences() {
 
     try {
       const url = editingId 
-        ? `http://localhost:5000/api/experiences/${editingId}` 
-        : 'http://localhost:5000/api/experiences';
+        ? `/api/experiences/${editingId}` 
+        : '/api/experiences';
       const method = editingId ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -110,7 +110,7 @@ export default function ManageExperiences() {
 
     const token = localStorage.getItem('adminToken');
     for (let i = 0; i < newExps.length; i++) {
-      await fetch(`http://localhost:5000/api/experiences/${newExps[i].id}`, {
+      await fetch(`/api/experiences/${newExps[i].id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ export default function ManageExperiences() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this experience item?')) return;
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/experiences/${id}`, {
+    await fetch(`/api/experiences/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

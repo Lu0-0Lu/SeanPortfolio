@@ -21,11 +21,11 @@ export default function ManageBookCategories() {
 
   const fetchData = async () => {
     try {
-      const catRes = await fetch('http://localhost:5000/api/book-categories');
+      const catRes = await fetch('/api/book-categories');
       const catData = await catRes.json();
       setCategories(catData);
 
-      const tagRes = await fetch('http://localhost:5000/api/book-tags');
+      const tagRes = await fetch('/api/book-tags');
       const tagData = await tagRes.json();
       setTags(tagData);
     } catch (err) {
@@ -38,7 +38,7 @@ export default function ManageBookCategories() {
   const handleSaveCategory = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('adminToken');
-    const url = categoryEditingId ? `http://localhost:5000/api/book-categories/${categoryEditingId}` : 'http://localhost:5000/api/book-categories';
+    const url = categoryEditingId ? `/api/book-categories/${categoryEditingId}` : '/api/book-categories';
     const method = categoryEditingId ? 'PUT' : 'POST';
 
     const res = await fetch(url, {
@@ -61,7 +61,7 @@ export default function ManageBookCategories() {
   const handleDeleteCategory = async (id) => {
     if (!window.confirm('Delete this category?')) return;
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/book-categories/${id}`, {
+    await fetch(`/api/book-categories/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -72,7 +72,7 @@ export default function ManageBookCategories() {
   const handleAddTag = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('adminToken');
-    const res = await fetch('http://localhost:5000/api/book-tags', {
+    const res = await fetch('/api/book-tags', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ name: tagName })
@@ -91,7 +91,7 @@ export default function ManageBookCategories() {
   const handleDeleteTag = async (id) => {
     if (!window.confirm('Delete this tag?')) return;
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/book-tags/${id}`, {
+    await fetch(`/api/book-tags/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

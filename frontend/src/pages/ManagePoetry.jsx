@@ -20,7 +20,7 @@ export default function ManagePoetry() {
   };
 
   const fetchPoetry = async () => {
-    const res = await fetch('http://localhost:5000/api/poetry');
+    const res = await fetch('/api/poetry');
     const data = await res.json();
     setPoetry(data);
   };
@@ -56,8 +56,8 @@ export default function ManagePoetry() {
 
     try {
       const url = editingId 
-        ? `http://localhost:5000/api/poetry/${editingId}` 
-        : 'http://localhost:5000/api/poetry';
+        ? `/api/poetry/${editingId}` 
+        : '/api/poetry';
       const method = editingId ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -109,7 +109,7 @@ export default function ManagePoetry() {
 
     const token = localStorage.getItem('adminToken');
     for (let i = 0; i < newItems.length; i++) {
-      await fetch(`http://localhost:5000/api/poetry/${newItems[i].id}`, {
+      await fetch(`/api/poetry/${newItems[i].id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ order_index: i })
@@ -120,7 +120,7 @@ export default function ManagePoetry() {
 
   const handleToggleFeature = async (id) => {
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/poetry/${id}`, {
+    await fetch(`/api/poetry/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ is_featured: true })
@@ -132,7 +132,7 @@ export default function ManagePoetry() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this poem?')) return;
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/poetry/${id}`, {
+    await fetch(`/api/poetry/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

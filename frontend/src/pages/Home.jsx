@@ -30,7 +30,7 @@ export default function Home() {
 
   // Fetch Featured Project
   useEffect(() => {
-    fetch('http://localhost:5000/api/projects')
+    fetch('/api/projects')
       .then((res) => res.json())
       .then((data) => {
         const featured = data.find((p) => p.is_featured) || data[0];

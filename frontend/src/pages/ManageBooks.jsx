@@ -27,17 +27,17 @@ export default function ManageBooks() {
 
   const fetchData = async () => {
     try {
-      const booksRes = await fetch('http://localhost:5000/api/books');
+      const booksRes = await fetch('/api/books');
       if (booksRes.ok) setBooks(await booksRes.json());
 
-      const catRes = await fetch('http://localhost:5000/api/book-categories');
+      const catRes = await fetch('/api/book-categories');
       if (catRes.ok) {
         const catData = await catRes.json();
         setCategoriesList(catData);
         if (catData.length > 0 && !categoryId) setCategoryId(catData[0].id);
       }
 
-      const tagRes = await fetch('http://localhost:5000/api/book-tags');
+      const tagRes = await fetch('/api/book-tags');
       if (tagRes.ok) {
         setTagsList(await tagRes.json());
       }
@@ -84,7 +84,7 @@ export default function ManageBooks() {
     const token = localStorage.getItem('adminToken');
 
     try {
-      const url = editingId ? `http://localhost:5000/api/books/${editingId}` : 'http://localhost:5000/api/books';
+      const url = editingId ? `/api/books/${editingId}` : '/api/books';
       const method = editingId ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -124,7 +124,7 @@ export default function ManageBooks() {
 
     const token = localStorage.getItem('adminToken');
     for (let i = 0; i < newItems.length; i++) {
-      await fetch(`http://localhost:5000/api/books/${newItems[i].id}`, {
+      await fetch(`/api/books/${newItems[i].id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ order_index: i })
@@ -136,7 +136,7 @@ export default function ManageBooks() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this book review?')) return;
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/books/${id}`, {
+    await fetch(`/api/books/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

@@ -18,7 +18,7 @@ const sanitize = (str) => {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'reyesseanbrandon@gmail.com',
+    user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_APP_PASSWORD // Never use your raw Gmail password; use a Google App Password
   }
 });
@@ -41,7 +41,7 @@ router.post('/', contactLimiter, async (req, res) => {
     // Setup email options
     const mailOptions = {
       from: email,
-      to: 'reyesseanbrandon@gmail.com',
+      to: process.env.EMAIL_USER,
       subject: `New Portfolio Message from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
     };

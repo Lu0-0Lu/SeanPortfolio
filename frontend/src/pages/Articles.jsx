@@ -16,7 +16,7 @@ export default function Articles() {
   const [isFeaturedVisible, setIsFeaturedVisible] = useState(false);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/articles')
+    fetch('/api/articles')
       .then((res) => res.json())
       .then((data) => {
         setArticles(data);

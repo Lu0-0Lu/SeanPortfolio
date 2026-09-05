@@ -22,13 +22,13 @@ export default function About() {
 
   useEffect(() => {
     // Fetch Experiences
-    fetch('http://localhost:5000/api/experiences')
+    fetch('/api/experiences')
       .then((res) => res.json())
       .then((data) => setExperiences(data))
       .catch((err) => console.error(err));
 
     // Fetch Certifications
-    fetch('http://localhost:5000/api/certifications')
+    fetch('/api/certifications')
       .then((res) => res.json())
       .then((data) => setCertifications(data))
       .catch((err) => console.error(err));

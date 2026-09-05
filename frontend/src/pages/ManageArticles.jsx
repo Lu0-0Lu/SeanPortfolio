@@ -23,13 +23,13 @@ export default function ManageArticles() {
   };
 
   const fetchArticles = async () => {
-    const res = await fetch('http://localhost:5000/api/articles');
+    const res = await fetch('/api/articles');
     const data = await res.json();
     setArticles(data);
   };
 
   const fetchCategories = async () => {
-    const res = await fetch('http://localhost:5000/api/categories');
+    const res = await fetch('/api/categories');
     const data = await res.json();
     setCategoriesList(data);
     
@@ -75,8 +75,8 @@ export default function ManageArticles() {
 
     try {
       const url = editingId 
-        ? `http://localhost:5000/api/articles/${editingId}` 
-        : 'http://localhost:5000/api/articles';
+        ? `/api/articles/${editingId}` 
+        : '/api/articles';
       const method = editingId ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -131,7 +131,7 @@ export default function ManageArticles() {
 
     const token = localStorage.getItem('adminToken');
     for (let i = 0; i < newItems.length; i++) {
-      await fetch(`http://localhost:5000/api/articles/${newItems[i].id}`, {
+      await fetch(`/api/articles/${newItems[i].id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ order_index: i })
@@ -142,7 +142,7 @@ export default function ManageArticles() {
 
   const handleToggleFeature = async (id) => {
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/articles/${id}`, {
+    await fetch(`/api/articles/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ is_featured: true })
@@ -154,7 +154,7 @@ export default function ManageArticles() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this article?')) return;
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/articles/${id}`, {
+    await fetch(`/api/articles/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

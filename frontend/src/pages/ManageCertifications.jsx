@@ -20,7 +20,7 @@ export default function ManageCertifications() {
   };
 
   const fetchCertifications = async () => {
-    const res = await fetch('http://localhost:5000/api/certifications');
+    const res = await fetch('/api/certifications');
     const data = await res.json();
     setCertifications(data);
   };
@@ -56,8 +56,8 @@ export default function ManageCertifications() {
 
     try {
       const url = editingId 
-        ? `http://localhost:5000/api/certifications/${editingId}` 
-        : 'http://localhost:5000/api/certifications';
+        ? `/api/certifications/${editingId}` 
+        : '/api/certifications';
       const method = editingId ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -110,7 +110,7 @@ export default function ManageCertifications() {
 
     const token = localStorage.getItem('adminToken');
     for (let i = 0; i < newCerts.length; i++) {
-      await fetch(`http://localhost:5000/api/certifications/${newCerts[i].id}`, {
+      await fetch(`/api/certifications/${newCerts[i].id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ export default function ManageCertifications() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this certification?')) return;
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/certifications/${id}`, {
+    await fetch(`/api/certifications/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

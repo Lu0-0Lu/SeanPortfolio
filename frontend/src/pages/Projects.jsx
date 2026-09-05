@@ -61,7 +61,7 @@ export default function Projects() {
 
   // Fetch Projects Data
   useEffect(() => {
-    fetch('http://localhost:5000/api/projects')
+    fetch('/api/projects')
       .then((res) => res.json())
       .then((data) => {
         const sortedData = data.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
