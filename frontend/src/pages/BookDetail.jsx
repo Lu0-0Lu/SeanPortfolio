@@ -19,8 +19,8 @@ export default function BookDetail() {
     const fetchData = async () => {
       try {
         const [bookRes, tagsRes] = await Promise.all([
-          fetch(`http://localhost:5000/api/books/${id}`),
-          fetch('http://localhost:5000/api/book-tags')
+          fetch(`/books/${id}`),
+          fetch('/api/book-tags')
         ]);
 
         if (bookRes.ok) setBook(await bookRes.json());

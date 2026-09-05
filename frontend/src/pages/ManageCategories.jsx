@@ -18,7 +18,7 @@ export default function ManageCategories() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/categories');
+      const res = await fetch('/api/categories');
       const data = await res.json();
       setCategories(data);
     } catch (err) {
@@ -47,8 +47,8 @@ export default function ManageCategories() {
 
     try {
       const url = editingId 
-        ? `http://localhost:5000/api/categories/${editingId}` 
-        : 'http://localhost:5000/api/categories';
+        ? `/api/categories/${editingId}` 
+        : '/api/categories';
       const method = editingId ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -95,7 +95,7 @@ export default function ManageCategories() {
 
     const token = localStorage.getItem('adminToken');
     for (let i = 0; i < newItems.length; i++) {
-      await fetch(`http://localhost:5000/api/categories/${newItems[i].id}`, {
+      await fetch(`/api/categories/${newItems[i].id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ order_index: i })
@@ -107,7 +107,7 @@ export default function ManageCategories() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this category? Articles in this category will not be deleted, but will lose their category.')) return;
     const token = localStorage.getItem('adminToken');
-    await fetch(`http://localhost:5000/api/categories/${id}`, {
+    await fetch(`/api/categories/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

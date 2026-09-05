@@ -10,7 +10,7 @@ export default function Login() {
     setError('');
     
     // Dynamically choose API base URL based on environment
-    const API_BASE_URL = import.meta.env.MODE === 'production' ? '' : 'http://localhost:5000';
+    const API_BASE_URL = import.meta.env.MODE === 'production' ? '' : '';
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/login`, {

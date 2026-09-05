@@ -15,7 +15,7 @@ export default function ArticleDetail() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/articles/${id}`)
+    fetch(`/api/articles/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error('Article not found');
         return res.json();
