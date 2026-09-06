@@ -19,7 +19,7 @@ export default function BookDetail() {
     const fetchData = async () => {
       try {
         const [bookRes, tagsRes] = await Promise.all([
-          fetch(`/books/${id}`),
+          fetch(`/api/books/${id}`),
           fetch('/api/book-tags')
         ]);
 
