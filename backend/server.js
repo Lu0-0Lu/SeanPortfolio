@@ -19,11 +19,20 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https:"], // Allows external image URLs
-        frameSrc: ["'self'", "https://www.youtube.com"], // Allows YouTube embeds
+        imgSrc: ["'self'", "data:", "https:"],
+        
+        // 1. Add specific iframe domains here
+        frameSrc: ["'self'", "https://www.youtube.com", "https://player.vimeo.com"], 
+        
+        // 2. Allow direct <video> tags from secure URLs
+        mediaSrc: ["'self'", "https:"], 
+        
         connectSrc: ["'self'"],
       },
     },
+    referrerPolicy: {
+      policy: "strict-origin-when-cross-origin"
+    }
   })
 );
 
