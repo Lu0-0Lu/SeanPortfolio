@@ -126,7 +126,7 @@ export default function Projects() {
                 </h1>
               
               <p className="mt-4 max-w-2xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Hardware builds, full-stack applications, and embedded system experiments.
+                Hardware builds, Full-stack applications, Design, and embedded system experiments.
               </p>
 
               {/* Fading Gradient Divider */}

@@ -6,3 +6,6 @@ backend/.env
 # Ignore node modules everywhere
 node_modules/
 **/node_modules/
+
+# Ignore admin creation script
+backend/createadmin.js

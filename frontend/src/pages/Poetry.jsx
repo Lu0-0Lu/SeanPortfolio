@@ -47,7 +47,7 @@ export default function Poetry() {
                 Poetry & Reflections
               </h1>
               <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
-                Explorations of existentialism, philosophy, and personal introspection.
+                Written pieces of poems and personal reflections.
               </p>
             </div>
 
